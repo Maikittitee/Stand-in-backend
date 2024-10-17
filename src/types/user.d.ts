@@ -4,5 +4,4 @@ export interface IUser{
 	password: string;
 	email: string;
 	update_at: Date;
-
 };

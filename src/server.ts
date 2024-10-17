@@ -5,8 +5,8 @@ import router from './route/index.js';
 import users from './route/users.js';
 import auth from './route/auth.js';
 
-const uri: string = process.env.ATLAS_URI || "";
-const PORT = process.env.PORT;
+const uri = process.env.ATLAS_URI;
+const PORT = process.env.PORT || 3000;
 
 
 mongoose.connect(uri)
@@ -27,6 +27,6 @@ app.get('/', (req, res) => {
     res.send('Hello, Stand In!');
 });
 
-app.listen(3000, () => {
-    console.log(`Server is listening on port ${3000}`);
+app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
 });
