@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import User from "../model/User.js"; // Ensure User is correctly typed in User.ts
-import { IUser } from "../types/user.js";
 import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 
 dotenv.config();
@@ -13,7 +12,7 @@ interface SignUpRequestBody {
 	username: string;
 	password: string;
 	email: string;
-  }
+}
 
 const router = express.Router();
 

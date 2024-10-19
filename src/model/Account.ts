@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { addressSchema } from './address.js';
+import { addressSchema } from './Address.js';
 
 
 export enum Role {

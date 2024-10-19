@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Brand, Product, ProductModel } from '../../model/product.js';
+import { Brand, Product, ProductModel } from '../../model/Product.js';
 
 export default Router()
 

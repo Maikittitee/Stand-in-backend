@@ -1,6 +1,6 @@
 import { Schema, Types } from 'mongoose';
-import { itemSchema, IItem } from './product.js';
-import { addressSchema, IAddress } from './address.js';
+import { itemSchema, IItem } from './Product.js';
+import { addressSchema, IAddress } from './Address.js';
 
 
 export enum TaskType {
@@ -18,13 +18,13 @@ interface ITask extends Types.Subdocument {
     kind: TaskType;
 }
 export const taskSchema = new Schema<ITask>({
-    kind: { 
-        type: String, 
-        enum: TaskType, 
+    kind: {
+        type: String,
+        enum: TaskType,
         required: true,
     },
-}, { 
-    discriminatorKey: 'kind', 
+}, {
+    discriminatorKey: 'kind',
     _id: false,
 });
 
@@ -40,17 +40,17 @@ export const queueingSchema = new Schema<IQueueing>({
         type: addressSchema,
         required: true,
     },
-    datetime: { 
-        type: Date, 
+    datetime: {
+        type: Date,
         required: true,
     },
-    size: { 
-        type: Number, 
+    size: {
+        type: Number,
         enum: PackageSize,
         required: true,
     },
-    detail: { 
-        type: String, 
+    detail: {
+        type: String,
         required: true,
     },
 }, {
@@ -63,8 +63,8 @@ interface IShopping extends ITask {
     items: IItem[];
 }
 export const shoppingSchema = new Schema<IShopping>({
-    store: { 
-        type: Schema.Types.ObjectId, 
+    store: {
+        type: Schema.Types.ObjectId,
         ref: 'Store',
         required: true,
     },

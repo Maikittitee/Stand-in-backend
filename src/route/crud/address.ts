@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Store, Building } from '../../model/address.js';
+import { Store, Building } from '../../model/Address.js';
 
 export default Router()
 

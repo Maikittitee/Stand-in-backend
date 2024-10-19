@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import router from './route/index.js';
-import users from './route/users.js';
+import users from './route/crud/users.js';
 import auth from './route/auth.js';
 
 const uri = process.env.ATLAS_URI;

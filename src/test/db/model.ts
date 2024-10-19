@@ -1,7 +1,7 @@
-import { Building, Store } from '../../model/address.js';
-import { Order, OrderStatus, TrackStatus } from '../../model/order.js';
-import { Brand, Product, ProductModel } from '../../model/product.js';
-import { TaskType, PackageSize } from '../../model/task.js';
+import { Building, Store } from '../../model/Address.js';
+import { Order, OrderStatus, TrackStatus } from '../../model/Order.js';
+import { Brand, Product, ProductModel } from '../../model/Product.js';
+import { TaskType, PackageSize } from '../../model/Task.js';
 
 import './connection.js';
 

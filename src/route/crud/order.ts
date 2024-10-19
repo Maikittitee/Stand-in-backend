@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Order } from '../../model/order.js';
+import { Order } from '../../model/Order.js';
 
 export default Router()
 

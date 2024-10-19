@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { Request } from "express-jwt";
 
 import { validate_jwt, check_auth } from '../middleware/auth.js';
-import { Order, OrderStatus } from '../model/order.js';
-import { TaskType } from '../model/task.js';
-import { TrackStatus } from '../model/order.js';
+import { Order, OrderStatus } from '../model/Order.js';
+import { TaskType } from '../model/Task.js';
+import { TrackStatus } from '../model/Order.js';
 // import { User } from '../model/test_user.js'
 
 export default Router()

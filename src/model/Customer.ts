@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
-import { Order } from './order.js';
-import { itemSchema } from './product.js';
+import { Order } from './Order.js';
+import { itemSchema } from './Product.js';
 import { Account, accountOption } from './Account.js';
 
 

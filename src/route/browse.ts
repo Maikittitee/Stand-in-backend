@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import * as fuzz from 'fuzzball';
 
-import { Product, ProductModel, Brand } from '../model/product.js';
-import { Store, Building } from '../model/address.js';
-// import { Stander } from '../model/test_stander.js';
+import { Product, ProductModel, Brand } from '../model/Product.js';
+import { Store, Building } from '../model/Address.js';
+import { Stander } from '../model/Stander.js';
 
 export default Router()
 
@@ -14,8 +14,8 @@ export default Router()
         store_id,
         brand_id,
         category,
-        min_price,
-        max_price,
+        price_start,
+        price_end,
         // option, // color, size, etc.
     } = req.query;
 
@@ -24,7 +24,7 @@ export default Router()
         brand: brand_id,
         variant: {
             $elemMatch: {
-                price: { $gte: min_price, $lte: max_price }
+                price: { $gte: price_start, $lte: price_end }
                 // option: 'color'
             }
         },
@@ -46,18 +46,18 @@ export default Router()
     res.json(products);
 })
 
-// .get('/stander', async (req, res, next) => {
-//     const { name } = req.query;
-//     const all_stander = await Stander.find();
+.get('/stander', async (req, res, next) => {
+    const { name } = req.query;
+    const all_stander = await Stander.find();
 
-//     const standers = fuzz.extract(name, all_stander, {
-//         scorer: fuzz.partial_ratio,
-//         processor: stander => stander.name,
-//         cutoff: 50,
-//     }).map(r => r[0]);
+    const standers = fuzz.extract(name, all_stander, {
+        scorer: fuzz.partial_ratio,
+        processor: stander => stander.name,
+        cutoff: 50,
+    }).map(r => r[0]);
 
-//     res.json(standers);
-// })
+    res.json(standers);
+})
 
 .get('/store', async (req, res, next) => {
     const { name } = req.query;

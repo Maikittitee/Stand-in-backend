@@ -2,8 +2,8 @@ import { Router } from 'express';
 import { Request } from "express-jwt";
 
 import { validate_jwt, check_auth } from '../middleware/auth.js';
-import { Order, OrderStatus } from '../model/order.js';
-import { TaskType } from '../model/task.js';
+import { Order, OrderStatus } from '../model/Order.js';
+import { TaskType } from '../model/Task.js';
 // import { Customer } from '../model/test_customer.js';
 
 
