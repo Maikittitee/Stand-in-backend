@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model} from 'mongoose';
 import { addressSchema } from './Address.js';
 
 
@@ -36,7 +36,7 @@ export const profileSchema = new Schema({
 });
 
 
-const accountSchema = new Schema({
+export const accountSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -54,4 +54,12 @@ const accountSchema = new Schema({
 }, accountOption);
 
 
-export const Account = model('account', accountSchema);
+export function isStander(account: any): account is TStander {
+    return account.role === Role.Stander;
+}
+export function isCustomer(account: any): account is TCustomer {
+    return account.role === Role.Customer;
+}
+
+
+export const Account = model('Account', accountSchema);

@@ -10,6 +10,7 @@ export enum OrderStatus {
     Paid,
     Completed,
 }
+
 export enum TrackStatus {
     On_the_way,
     Arrived_at_store,
@@ -35,7 +36,7 @@ const reviewSchema = new Schema({
 });
 
 
-const orderSchema = new Schema({
+export const orderSchema = new Schema({
     task: {
         type: taskSchema,
         required: true,
@@ -58,17 +59,17 @@ const orderSchema = new Schema({
             required: true,
         },
     }],
+    customer: {
+        type: Schema.Types.ObjectId,
+        ref: 'Customer',
+        required: true,
+    },
+    stander: {
+        type: Schema.Types.ObjectId,
+        ref: 'Stander',
+        required: true,
+    },
     review: reviewSchema,
-    // customer: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Customer',
-    //     required: true,
-    // },
-    // stander: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Stander',
-    //     required: true,
-    // },
 }, {
     timestamps: true,
 });

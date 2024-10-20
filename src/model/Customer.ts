@@ -4,7 +4,7 @@ import { itemSchema } from './Product.js';
 import { Account, accountOption } from './Account.js';
 
 
-const customerSchema = new Schema({
+export const customerSchema = new Schema({
     cart: [itemSchema],
 }, {
     virtuals: {

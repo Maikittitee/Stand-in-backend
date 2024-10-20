@@ -4,7 +4,7 @@ import { PackageSize } from './Task.js';
 import { Account, accountOption } from './Account.js';
 
 
-const serviceSchema = new Schema({
+export const serviceSchema = new Schema({
     queueing: {
         available: {
             type: Boolean,
@@ -36,15 +36,15 @@ const serviceSchema = new Schema({
             required: true,
         },
     },
-    // stander: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Stander',
-    //     required: true,
-    // },
+    stander: {
+        type: Schema.Types.ObjectId,
+        ref: 'Stander',
+        required: true,
+    },
 });
 
 
-const standerSchema = new Schema({
+export const standerSchema = new Schema({
     commission: {
         type: Schema.Types.ObjectId,
         ref: 'Commission',
