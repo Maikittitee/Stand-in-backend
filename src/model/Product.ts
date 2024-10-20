@@ -1,4 +1,4 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 
 export const Category = [
@@ -11,7 +11,7 @@ export const Category = [
 ];
 
 
-const brandSchema = new Schema({
+export const brandSchema = new Schema({
     name: {
         type: String,
         unique: true,
@@ -23,7 +23,7 @@ const brandSchema = new Schema({
 });
 
 
-const variantSchema = new Schema({
+export const variantSchema = new Schema({
     images: [String],
     price: {
         type: Number,
@@ -37,7 +37,7 @@ const variantSchema = new Schema({
 });
 
 
-const modelSchema = new Schema({
+export const modelSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -55,7 +55,7 @@ const modelSchema = new Schema({
 });
 
 
-const productSchema = new Schema({
+export const productSchema = new Schema({
     store: {
         type: Schema.Types.ObjectId,
         ref: 'Store',
@@ -82,12 +82,7 @@ const productSchema = new Schema({
 });
 
 
-export interface IItem extends Types.Subdocument {
-    product: Types.ObjectId;
-    variant: Types.ObjectId;
-    quantity: number;
-}
-export const itemSchema = new Schema<IItem>({
+export const itemSchema = new Schema({
     product: {
         type: Schema.Types.ObjectId,
         ref: 'Product',

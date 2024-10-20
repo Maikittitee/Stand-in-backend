@@ -1,6 +1,6 @@
-import { Schema, Types } from 'mongoose';
-import { itemSchema, IItem } from './Product.js';
-import { addressSchema, IAddress } from './Address.js';
+import { Schema } from 'mongoose';
+import { itemSchema } from './Product.js';
+import { addressSchema } from './Address.js';
 
 
 export enum TaskType {
@@ -14,10 +14,7 @@ export enum PackageSize {
 }
 
 
-interface ITask extends Types.Subdocument {
-    kind: TaskType;
-}
-export const taskSchema = new Schema<ITask>({
+export const taskSchema = new Schema({
     kind: {
         type: String,
         enum: TaskType,
@@ -29,13 +26,7 @@ export const taskSchema = new Schema<ITask>({
 });
 
 
-interface IQueueing extends ITask {
-    location: IAddress;
-    datetime: Date;
-    size: Number;
-    detail: String;
-}
-export const queueingSchema = new Schema<IQueueing>({
+export const queueingSchema = new Schema({
     location: {
         type: addressSchema,
         required: true,
@@ -58,11 +49,7 @@ export const queueingSchema = new Schema<IQueueing>({
 });
 
 
-interface IShopping extends ITask {
-    store: Types.ObjectId;
-    items: IItem[];
-}
-export const shoppingSchema = new Schema<IShopping>({
+export const shoppingSchema = new Schema({
     store: {
         type: Schema.Types.ObjectId,
         ref: 'Store',
@@ -74,10 +61,10 @@ export const shoppingSchema = new Schema<IShopping>({
 });
 
 
-export function isQueueing(task: any): task is IQueueing {
+export function isQueueing(task: any): task is TQueueing {
     return task.kind === TaskType.Queueing;
 }
-export function isShopping(task: any): task is IShopping {
+export function isShopping(task: any): task is TShopping {
     return task.kind === TaskType.Shopping;
 }
 
