@@ -1,69 +1,61 @@
 import { Router } from 'express';
-import { Request } from "express-jwt";
+import { validate_jwt, validate_account } from '../middleware/auth.js';
 
-import { validate_jwt, check_auth } from '../middleware/auth.js';
 import { Order, OrderStatus } from '../model/Order.js';
 import { TaskType } from '../model/Task.js';
-// import { Customer } from '../model/test_customer.js';
+import { Role } from '../model/Account.js';
 
 
 export default Router()
+    .use(validate_jwt)
+    .use(validate_account(Role.Customer))
 
-.use(validate_jwt)
-.use(check_auth)
+.get('/profile', async (req: CustomerRequest, res, next) => {
+	const customer = req.auth!.user;
+    const profile = await customer.populate(''); //?
 
-.get('/history', async (req: Request, res, next) => {
-    const user_id = req.auth?.user; // customer_id ?
-    const orders = await Order.find({ customer: user_id });
+    res.json(profile);
+})
+
+.get('/history', async (req: CustomerRequest, res, next) => {
+    const customer = req.auth!.user;
+    const orders = await Order.find({ customer: customer._id });
 
     const ordersPop = orders.map(async (order) => {
         if (order.task?.kind == TaskType.Shopping) {
             return await order.populate('store')
         }
         else {
-            return order;
+            return order; //?
         }
     });
 
     res.json(ordersPop);
 })
 
-.get('/cart', async (req: Request, res, next) => {
-    const user_id = req.auth?.user; // customer_id
-    // @ts-expect-error
-    const customer = await Customer.findById(user_id);
+.get('/cart', async (req: CustomerRequest, res, next) => {
+    const customer = req.auth!.user;
+    // customer.cart.find()?.populate('product');
 
-    if (customer == null) {
-        res.status(404);
-        return;
-    }
-    customer.cart.find({})?.populate('product');
     const cartPop = customer.cart.map(async (item: any) => {
-        await item.populate('product')
-        return;
+        return await item.populate('product');
     });
 
     res.json(cartPop);
 })
 
-.post('/cart', async (req: Request, res, next) => {
-    const customer_id = req.auth?.user;
-    // @ts-expect-error
-    const customer = await Customer.findById(customer_id);
+.post('/cart', async (req: CustomerRequest, res, next) => {
+    const customer = req.auth!.user;
 
-    if (customer == null) {
-        res.status(404);
-        return;
-    }
     customer.cart.push(req.body);
     customer.save();
 
     res.json(customer.cart);
 })
 
-.post('/review', async (req: Request, res, next) => {
+.post('/review', async (req: CustomerRequest, res, next) => {
+    const customer = req.auth!.user;
     const { order_id } = req.query;
-    const customer_id = res.auth.user;
 
     const order = await Order.findById(order_id);
 
@@ -72,7 +64,7 @@ export default Router()
         return;
     }
 
-    if (order.customer != customer_id) {
+    if (order.customer != customer._id) {
         res.status(403);
         return;
     }
@@ -83,9 +75,10 @@ export default Router()
     res.json(order.review);
 })
 
-.get('/pay', async (req: Request, res, next) => {
+.get('/pay', async (req: CustomerRequest, res, next) => {
+    const customer = req.auth!.user;
     const { order_id } = req.query;
-    const customer_id = res.auth?.user;
+
     const order = await Order.findById(order_id);
 
     if (order == null) {
@@ -93,7 +86,7 @@ export default Router()
         return;
     }
 
-    if (order.customer != customer_id) {
+    if (order.customer != customer._id) {
         res.status(403);
         return;
     }

@@ -1,11 +1,9 @@
+import 'dotenv/config';
 import express, { Request, Response, NextFunction } from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import User from "../model/User.js"; // Ensure User is correctly typed in User.ts
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-dotenv.config();
 
 interface SignUpRequestBody {
 	fullname: string;
@@ -41,7 +39,7 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 	try {
 		const { username, password } = req.body as { username: string; password: string };
 
-		const user_data: any = await User.findOne({ username });
+		const user_data = await User.findOne({ username });
 		if (user_data == null) {
 			res.status(400).json({
 				message: "Login Failed (user not found)"
@@ -58,10 +56,12 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 			return;
 		}
 
-		const token = jwt.sign({
-			username: user_data.username,
-			role: "user"
-		}, "secret" , {expiresIn: "1h"} );
+		const token = jwt.sign(
+			user_data.username,
+			process.env.JWT_SECRET,
+			{ expiresIn: "1h" }
+		);
+
 		res.json({
 			message: "Login success",
 			token
@@ -75,24 +75,5 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 	}
 });
 
-router.get('/me', async (req: Request, res: Response) => {
-	try {
-		const authHeader: any = req.headers["authorization"];
-		console.log(authHeader)
-		let authToken = ''
-		if (authHeader){
-			authToken = authHeader.split(' ')[1];
-		}
-		const user_data: any = jwt.verify(authToken, 'secret');
-		console.log(user_data);
-		const LoginUser = await User.findOne({username: user_data['username']});
-		res.json({
-			"message": "successful",
-			"data": LoginUser
-		});
-	} catch (error) {
-		res.json({ "message": error });
-	}
-});
 
 export default router;

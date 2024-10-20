@@ -1,23 +1,26 @@
 import { Router } from 'express';
-import { Request } from "express-jwt";
+import { validate_jwt, validate_account } from '../middleware/auth.js';
 
-import { validate_jwt, check_auth } from '../middleware/auth.js';
-import { Order, OrderStatus } from '../model/Order.js';
+import { Order, OrderStatus, TrackStatus } from '../model/Order.js';
 import { TaskType } from '../model/Task.js';
-import { TrackStatus } from '../model/Order.js';
-// import { User } from '../model/test_user.js'
+import { Role } from '../model/Account.js';
+
 
 export default Router()
+    .use(validate_account(Role.Stander))
 
-.use(validate_jwt)
-.use(check_auth)
 
-.get('/history', async (req: Request, res, next) => {
-    const authHeader = req.headers["authorization"];
+.get('/profile', async (req: StanderRequest, res, next) => {
+    const stander = req.auth!.user;
+    const profile = await stander.populate(''); //?
 
-    // @ts-expect-error
-    const stander_id = user_data['username'];
-    const orders = await Order.find({ stander: stander_id });
+    res.json(profile);
+})
+
+
+.get('/history', async (req: StanderRequest, res, next) => {
+    const stander = req.auth!.user;
+    const orders = await Order.find({ stander: stander._id });
 
     const ordersPop = orders.map(async (order) => {
         if (order.task?.kind == TaskType.Shopping) {
@@ -31,11 +34,10 @@ export default Router()
     res.json(ordersPop);
 })
 
-.post('/order/:id/taking', async (req: Request, res, next) => {
+.post('/order/:id/taking', async (req: StanderRequest, res, next) => {
+    const stander = req.auth!.user;
     const { id } = req.params;
     const action: boolean = req.body.taking;
-    // @ts-expect-error
-    const stander_id = res.auth.user;
 
     const order = await Order.findById(id);
 
@@ -44,7 +46,7 @@ export default Router()
         return;
     }
     else {
-        if (order.stander != stander_id) {
+        if (order.stander != stander._id) {
             res.status(401);
             return;
         }
@@ -66,11 +68,10 @@ export default Router()
     res.json(order.status);
 })
 
-.post('/order/:id/tracking', async (req: Request, res, next) => {
+.post('/order/:id/tracking', async (req: StanderRequest, res, next) => {
+    const stander = req.auth!.user;
     const { id } = req.params;
     const status: TrackStatus = req.body.status;
-    // @ts-expect-error
-    const stander_id = res.auth.user;
 
     const order = await Order.findById(id);
 
@@ -79,7 +80,7 @@ export default Router()
         return;
     }
     else {
-        if (order.stander != stander_id) {
+        if (order.stander != stander._id) {
             res.status(401);
             return;
         }
