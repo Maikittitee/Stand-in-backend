@@ -1,4 +1,4 @@
-import { Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { addressSchema } from './Address.js';
 
 
@@ -14,7 +14,7 @@ export const accountOption = {
 }
 
 
-export const profileSchema = new Schema({
+const profileSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -33,6 +33,8 @@ export const profileSchema = new Schema({
     // creditcard?: {
     //     number: String;
     // }
+}, {
+    timestamps: true,
 });
 
 

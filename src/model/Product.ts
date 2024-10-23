@@ -23,20 +23,6 @@ export const brandSchema = new Schema({
 });
 
 
-export const variantSchema = new Schema({
-    images: [String],
-    price: {
-        type: Number,
-    },
-    description: {
-        type: String,
-    },
-    option: {
-        type: String,
-    }
-});
-
-
 export const modelSchema = new Schema({
     name: {
         type: String,
@@ -51,7 +37,30 @@ export const modelSchema = new Schema({
         type: String,
         enum: Category,
     },
-    variant: [variantSchema],
+    description: {
+        type: String,
+    },
+});
+
+
+export const variantSchema = new Schema({
+    images: [String],
+    product_model: {
+        type: Schema.Types.ObjectId,
+        ref: 'ProductModel',
+        required: true,
+    },
+    price: {
+        type: Number,
+        required: true,
+    },
+    description: {
+        type: String,
+    },
+    option: {
+        type: Map,
+        of: String,
+    }
 });
 
 
@@ -61,24 +70,16 @@ export const productSchema = new Schema({
         ref: 'Store',
         required: true,
     },
-    model: {
+    variant: {
         type: Schema.Types.ObjectId,
-        ref: 'ProductModel',
+        ref: 'ProductVariant',
         required: true,
     },
-    subproduct: [{
-        _id: false,
-        variant: {
-            type: Schema.Types.ObjectId,
-            // ref: 'ProductModel.variant',
-            required: true,
-        },
-        available: {
-            type: Boolean,
-            default: true,
-            required: true,
-        },
-    }],
+    available: {
+        type: Boolean,
+        default: true,
+        required: true,
+    },
 });
 
 
@@ -86,11 +87,6 @@ export const itemSchema = new Schema({
     product: {
         type: Schema.Types.ObjectId,
         ref: 'Product',
-        required: true,
-    },
-    variant: {
-        type: Schema.Types.ObjectId,
-        // ref: 'ProductModel.variant',
         required: true,
     },
     quantity: {
@@ -108,5 +104,6 @@ export const itemSchema = new Schema({
 // https://stackoverflow.com/questions/24923469/modeling-product-variants
 
 export const Brand = model('Brand', brandSchema);
+export const ProductVariant = model('ProductVariant', variantSchema);
 export const ProductModel = model('ProductModel', modelSchema);
 export const Product = model('Product', productSchema);

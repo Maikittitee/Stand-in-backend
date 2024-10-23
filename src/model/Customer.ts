@@ -14,7 +14,7 @@ export const customerSchema = new Schema({
             }
         },
     },
-    ...accountOption,
+    // ...accountOption,
 });
 
 

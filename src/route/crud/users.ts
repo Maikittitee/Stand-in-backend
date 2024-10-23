@@ -32,8 +32,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
 router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await User.findByIdAndUpdate(req.params.id, req.body);
-		const user = await User.findById(req.params.id); // Await added here
+		const user = await User.findByIdAndUpdate(req.params.id, req.body);
 		res.json(user);
 	} catch (err) {
 		next(err);

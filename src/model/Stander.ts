@@ -58,7 +58,7 @@ export const standerSchema = new Schema({
             }
         },
     },
-    ...accountOption,
+    // ...accountOption,
 });
 
 

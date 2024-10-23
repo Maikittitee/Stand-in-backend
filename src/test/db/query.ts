@@ -37,7 +37,7 @@ console.log(product2);
 const product3 = await product2?.populate('store');
 console.log(product3);
 
-// const product4 = await product3?.populate('subproduct');
+// const product4 = await product3?.populate('subproducts');
 // console.log(product4);
 
 

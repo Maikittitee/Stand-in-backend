@@ -42,3 +42,9 @@ A simple API built using Express.js.
 	```bash
 	npm test <filename.js>
 	```
+
+
+## Mocking database
+	```bash
+	npm test mockup.js
+	```
