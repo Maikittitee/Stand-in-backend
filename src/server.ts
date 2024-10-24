@@ -20,10 +20,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(router);
-app.use('/users', users);
-app.use('/auth', auth);
 
 app.get('/', (req, res) => {
     res.send('Hello, Stand In!');

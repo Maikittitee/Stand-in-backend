@@ -5,6 +5,7 @@ import { standerSchema } from '../model/Stander.js';
 import { customerSchema } from '../model/Customer.js';
 import { modelSchema } from '../model/Product.ts';
 import { orderSchema } from '../model/Order.js';
+import { userSchema } from '../model/User.js';
 import { taskSchema, queueingSchema, shoppingSchema } from '../model/Task.js';
 
 
@@ -38,6 +39,7 @@ declare global {
     > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
 
+    type TUser              = HydratedDocumentFromSchema<typeof userSchema>;
     type TAccount           = HydratedDocumentFromSchema<typeof accountSchema>;
     type TCustomerSchema    = CombinedSchema<typeof accountSchema, typeof customerSchema>;
     type TStanderSchema     = CombinedSchema<typeof accountSchema, typeof standerSchema>;
