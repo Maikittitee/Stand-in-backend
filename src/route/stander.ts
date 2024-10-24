@@ -13,24 +13,24 @@ export default Router()
 
 .get('/history', async (req: StanderRequest, res) => {
     const stander = req.auth!.user;
-    const orders = await Order.find({ stander: stander._id });
+    const history = await stander.getHistory();
 
-    res.json(orders);
+    res.json(history);
 })
 
 .post('/order/:id/accept', async (req: StanderRequest, res) => {
     const stander = req.auth!.user;
     const order = await Order.findById(req.params.id);
 
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
-    if (order.stander != stander._id) {
+    if (order.stander !== stander._id) {
         res.status(401);
         return;
     }
-    if (order.orderStatus.at(-1)!.status != OrderStatus.Pending) {
+    if (order.orderStatus.at(-1)!.status !== OrderStatus.Pending) {
         res.status(400);
         return;
     }
@@ -45,15 +45,15 @@ export default Router()
     const stander = req.auth!.user;
     const order = await Order.findById(req.params.id);
 
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
-    if (order.stander != stander._id) {
+    if (order.stander !== stander._id) {
         res.status(401);
         return;
     }
-    if (order.orderStatus.at(-1)!.status != OrderStatus.Pending) {
+    if (order.orderStatus.at(-1)!.status !== OrderStatus.Pending) {
         res.status(400);
         return;
     }
@@ -64,24 +64,28 @@ export default Router()
     res.json(order.orderStatus);
 })
 
-.post('/order/:id/status', async (req: StanderRequest, res) => {
+.post('/order/:id/tracking', async (req: StanderRequest, res) => {
     const stander = req.auth!.user;
     const order = await Order.findById(req.params.id);
 
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
-    if (order.stander != stander._id) {
+    if (order.stander !== stander._id) {
         res.status(401);
         return;
     }
 
     let status: TrackStatus = req.body.status;
 
-    if (status == undefined) {
+    if (status === undefined) {
         const currentStatus = order.trackStatus.at(-1)!.status;
         status = currentStatus + 1;
+    }
+
+    if (status === TrackStatus.Delivered) {
+        order.orderStatus.push({ status: OrderStatus.Completed });
     }
 
     order.trackStatus.push({ status });

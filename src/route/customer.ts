@@ -11,30 +11,21 @@ export default Router()
     .use(validate_account(Role.Customer))
 
 
-.get('/history', async (req: CustomerRequest, res, next) => {
+.get('/history', async (req: CustomerRequest, res) => {
     const customer = req.auth!.user;
-    const orders = await Order.find({ customer: customer._id });
+    const history = await customer.getHistory();
 
-    const ordersPop = orders.map(async (order) => {
-        if (order.task!.kind == TaskType.Shopping) {
-            return await order.populate('store')
-        }
-        else {
-            return order; //?
-        }
-    });
-
-    res.json(ordersPop);
+    res.json(history);
 })
 
-.get('/cart', async (req: CustomerRequest, res, next) => {
+.get('/cart', async (req: CustomerRequest, res) => {
     const customer = req.auth!.user;
-    const cart = await customer.populate('cart.product');
+    const customerPop = await customer.populate('cart.product');
 
-    res.json(cart);
+    res.json(customerPop.cart);
 })
 
-.post('/cart', async (req: CustomerRequest, res, next) => {
+.post('/cart', async (req: CustomerRequest, res) => {
     const customer = req.auth!.user;
 
     customer.cart.push(req.body);
@@ -43,19 +34,20 @@ export default Router()
     res.json(customer.cart);
 })
 
-.post('/review', async (req: CustomerRequest, res, next) => {
+.post('/order/:id/review', async (req: CustomerRequest, res) => {
     const customer = req.auth!.user;
-    const { order_id } = req.query;
+    const order = await Order.findById(req.params.id);
 
-    const order = await Order.findById(order_id);
-
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
-
-    if (order.customer != customer._id) {
+    if (order.customer !== customer._id) {
         res.status(403);
+        return;
+    }
+    if (order.orderStatus.at(-1)!.status !== OrderStatus.Completed) {
+        res.status(400);
         return;
     }
 
@@ -65,31 +57,78 @@ export default Router()
     res.json(order.review);
 })
 
-.get('/pay', async (req: CustomerRequest, res, next) => {
+.get('/order/:id/pay', async (req: CustomerRequest, res) => {
     const customer = req.auth!.user;
-    const { order: order_id } = req.query;
+    const order = await Order.findById(req.params.id);
 
-    const order = await Order.findById(order_id);
-
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
-
-    if (order.customer != customer._id) {
+    if (order.customer !== customer._id) {
         res.status(403);
         return;
     }
+    if (order.orderStatus.at(-1)!.status !== OrderStatus.Accepted) {
+        res.status(400);
+        return;
+    }
 
-    order.orderStatus.push(
-        { status: OrderStatus.Paid }
-    );
+    order.orderStatus.push({ status: OrderStatus.Paid });
     order.save();
 
     res.json(order.orderStatus);
 })
 
-.post('/order', async (req: CustomerRequest, res, next) => {
+.post('/order/:id/cancel', async (req: CustomerRequest, res) => {
+    const customer = req.auth!.user;
+    const order = await Order.findById(req.params.id);
+
+    if (order === null) {
+        res.status(404);
+        return;
+    }
+    if (order.customer !== customer._id) {
+        res.status(403);
+        return;
+    }
+    if (order.orderStatus.at(-1)!.status >= OrderStatus.Paid) {
+        res.status(400);
+        return;
+    }
+
+    order.orderStatus.push({ status: OrderStatus.Cancelled });
+    order.save();
+
+    res.json(order.orderStatus);
+})
+
+.post('/order/:id/stander', async (req: CustomerRequest, res) => {
+    const customer = req.auth!.user;
+    const { stander } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (order === null) {
+        res.status(404);
+        return;
+    }
+    if (order.customer !== customer._id) {
+        res.status(403);
+        return;
+    }
+    if (order.orderStatus.at(-1)!.status !== OrderStatus.Rejected) {
+        res.status(400);
+        return;
+    }
+
+    order.orderStatus.push({ status: OrderStatus.Pending });
+    order.stander = stander;
+    order.save();
+
+    res.json(order.orderStatus);
+})
+
+.post('/order', async (req: CustomerRequest, res) => {
     const customer = req.auth!.user;
     const { stander, task } = req.body;
     let order;

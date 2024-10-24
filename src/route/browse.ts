@@ -67,14 +67,27 @@ export default Router()
 .get('/stander', async (req, res, next) => {
     const { name, location, product } = req.query;
 
-    let standers = await Stander
-        .find({
-            // service: {
-            //     location: location,
-            //     product: product, //?
-            // }
-        })
-        .sort({ 'service.rating': -1 });
+    const filtered_standers = await Stander.find({
+        // service: {
+        //     location: location,
+        //     products: { $eleMatch: product },
+        // }
+    });
+
+    const scores = await Promise.all(
+        filtered_standers.map(async (stander) => {
+            const score = await stander.getScore();
+
+            if (score === undefined) {
+                return { stander, score: 3 };
+            }
+            return { stander, score };
+        }
+    ));
+
+    let standers = scores
+        .sort((a, b) => b.score - a.score)
+        .map(s => s.stander);
 
     if (name) {
         standers = fuzz.extract(name, standers, {
