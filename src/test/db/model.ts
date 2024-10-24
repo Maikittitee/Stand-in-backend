@@ -2,8 +2,38 @@ import { Building, Store } from '../../model/Address.js';
 import { Order, OrderStatus, TrackStatus } from '../../model/Order.js';
 import { Brand, Product, ProductModel, ProductVariant } from '../../model/Product.js';
 import { TaskType, PackageSize } from '../../model/Task.js';
+import { Customer } from '../../model/Customer.js';
+import { Stander } from '../../model/Stander.js';
+import { User } from '../../model/User.js';
 
-import './connection.js';
+
+// for mocking address
+const addrTable = {
+    kmitl: {
+        country: 'Thailand',
+        zipcode: '10520',
+        province: 'Bangkok',
+        district: 'Lat Krabang',
+        subdistrict: 'Lat Krabang',
+        detail: '1 Chalong Krung 1 Alley',
+    },
+    mega: {
+        country: 'Thailand',
+        zipcode: '10540',
+        province: 'Samut Prakan',
+        district: 'Bang Phli',
+        subdistrict: 'Bang Kaeo',
+        detail: '38 39 /1-3 No.6 Bang Na-Trat Frontage Rd',
+    },
+    pathum_wan: {
+        country: 'Thailand',
+        zipcode: '10330',
+        province: 'Bangkok',
+        district: 'Pathum Wan',
+        subdistrict: 'Pathum Wan',
+        detail: 'some where',
+    },
+}
 
 
 export const siam_paragon = new Building({
@@ -76,6 +106,7 @@ export const taylor = new Brand({
 export const tmc035 = new ProductModel({
     name: 'TMC-035EQ',
     brand: crafter._id,
+    description: 'One of the best "Orchestra" body type guitars',
     // category: undefined,
 });
 export const vtmc035 = new ProductVariant({
@@ -84,7 +115,6 @@ export const vtmc035 = new ProductVariant({
     ],
     product_model: tmc035._id,
     price: 19600,
-    description: 'One of the best "Orchestra" body type guitars',
     // option: undefined,
 });
 
@@ -92,6 +122,7 @@ export const vtmc035 = new ProductVariant({
 export const flow_oc = new ProductModel({
     name: 'Flow-OC',
     brand: cort._id,
+    description: 'Innovative Design Most Suited for Fingerstyle Artists & Enthusiasts',
     // category: undefined,
 });
 export const vflow_oc = new ProductVariant({
@@ -102,7 +133,6 @@ export const vflow_oc = new ProductVariant({
     ],
     product_model: flow_oc._id,
     price: 29900,
-    description: 'Innovative Design Most Suited for Fingerstyle Artists & Enthusiasts',
     // option: undefined,
 });
 
@@ -110,6 +140,7 @@ export const vflow_oc = new ProductVariant({
 export const guitar_mod1 = new ProductModel({
     name: 'ACFS580CE',
     brand: ibanez._id,
+    description: 'Every single detail is designed to cover a wide range of playing styles; Whether you’re a traditional fingerpicker, or at the forefront of modern percussive playing.',
     // category: undefined,
 });
 export const vguitar_mod1 = new ProductVariant({
@@ -118,7 +149,6 @@ export const vguitar_mod1 = new ProductVariant({
     ],
     product_model: guitar_mod1._id,
     price: 39000,
-    description: 'Every single detail is designed to cover a wide range of playing styles; Whether you’re a traditional fingerpicker, or at the forefront of modern percussive playing.',
     // option: undefined,
 });
 
@@ -126,6 +156,7 @@ export const vguitar_mod1 = new ProductVariant({
 export const guitar_mod2 = new ProductModel({
     name: 'PA230E',
     brand: ibanez._id,
+    description: 'This line features a uniquely shaped asymmetrical jumbo body with slightly more surface area on the upper side of the body',
     // category: undefined,
 });
 export const vguitar_mod2 = new ProductVariant({
@@ -134,7 +165,6 @@ export const vguitar_mod2 = new ProductVariant({
     ],
     product_model: guitar_mod2._id,
     price: 25900,
-    description: 'This line features a uniquely shaped asymmetrical jumbo body with slightly more surface area on the upper side of the body',
     // option: undefined,
 });
 
@@ -145,14 +175,15 @@ export const guitar_mod3 = new ProductModel({
     description: 'Built on the all-star tonewood pairing of Indian rosewood and Sitka spruce, the 812ce offers players a more compact take on the flagship Taylor experience.',
     // category: undefined,
 });
+
 export const v1_guitar_mod3 = new ProductVariant({
     images: [
         'https://www.taylorguitars.com/sites/default/files/styles/guitar_desktop/public/2022-02-08/812ce-Front.png?itok=D7kqUZZS',
     ],
     product_model: guitar_mod3._id,
     price: 150000,
-    option: {
-        lefthand: 'false'
+    options: {
+        lefthand: 'false',
     },
 });
 export const v2_guitar_mod3 = new ProductVariant({
@@ -161,82 +192,144 @@ export const v2_guitar_mod3 = new ProductVariant({
     ],
     product_model: guitar_mod3._id,
     price: 150000,
-    option: {
-        lefthand: 'true'
+    options: {
+        lefthand: 'true',
     },
     description: 'for left-handed',
+});
+export const v3_guitar_mod3 = new ProductVariant({
+    images: [
+        'https://www.taylorguitars.com/sites/default/files/styles/guitar_desktop/public/2022-02-08/812ce-Front.png?itok=D7kqUZZS',
+    ],
+    product_model: guitar_mod3._id,
+    price: 150000,
+    options: {
+        lefthand: 'false',
+        pickguard: 'black',
+    },
 });
 
 
 // guitar selling at store
 export const old_guitar = new Product({
     store: music_collection._id,
-    model: tmc035._id,
-    subproducts: [{
-        variant: vtmc035._id,
-        available: true,
-    }],
+    variant: vtmc035._id,
+    available: true,
 });
-export const great_one = new Product({
+export const great_guitar = new Product({
     store: ct_music._id,
-    model: flow_oc._id,
-    subproducts: [{
-        variant: vflow_oc._id,
+    variant: vflow_oc._id,
+    available: false,
+});
+export const right_guitar = new Product({
+    store: music_collection._id,
+    variant: v1_guitar_mod3._id,
+    available: true,
+});
+export const left_guitar = new Product({
+    store: music_collection._id,
+    variant: v2_guitar_mod3._id,
+    available: true,
+});
+export const test_guitar = new Product({
+    store: music_collection._id,
+    variant: v3_guitar_mod3._id,
+    available: true,
+});
+
+
+export const cuser1 = new User({
+    username: 'customer1',
+    password: 'password',
+    email: 'customer1@gmail.com'
+});
+export const customer1 = new Customer({
+    user: cuser1._id,
+    profile: {
+        name: 'banana',
+        image: 'https://nwadventurerentals.com/wp-content/uploads/2023/08/magpie-looking-at-grass-1024x683.webp',
+        phone: '0812345677',
+        address: {
+            kmitl: addrTable.kmitl,
+            home: addrTable.mega,
+        },
+    },
+    cart: [
+        { product: old_guitar._id,      quantity: 1  },
+        { product: right_guitar._id,    quantity: 10 },
+    ],
+});
+
+
+export const suser1 = new User({
+    username: 'stander1',
+    password: 'password',
+    email: 'stander1@gmail.com'
+});
+export const stander1 = new Stander({
+    user: suser1._id,
+    profile: {
+        name: 'water',
+        image: 'https://www.doggoneproblems.com/wp-content/uploads/2017/08/Becca.jpg',
+        phone: '0812345678',
+        address: {
+            place1: addrTable.mega,
+        },
+    },
+    queueing: {
         available: true,
-    }],
+        charge: {
+            [PackageSize.Small]: 70,
+            [PackageSize.Medium]: 120,
+        },
+        description: 'I am a Best stander',
+    },
+    shopping: {
+        available: true,
+        charge: 300,
+    },
 });
 
 
 export const guitar_order = new Order({
+    customer: customer1._id,
+    stander: stander1._id,
     task: {
         kind: TaskType.Shopping,
         store: music_collection._id,
         items: [{
             product: old_guitar._id,
-            variant: tmc035.variant[0]._id,
             quantity: 1,
         }],
     },
-    status: OrderStatus.Paid,
+    orderStatus: [
+        { status: OrderStatus.Paid },
+    ],
     trackStatus: [
-        {
-            datetime: Date.now(),
-            status: TrackStatus.On_the_way
-        }, {
-            datetime: Date.now(),
-            status: TrackStatus.Arrived_at_store
-        }, {
-            datetime: Date.now(),
-            status: TrackStatu
-             s.Item_recieved
-        },
+        { status: TrackStatus.On_the_way },
+        { status: TrackStatus.Arrived_at_store },
+        { status: TrackStatus.Item_recieved },
     ],
     review: {
         rating: 4,
         comment: 'I am satisfied',
     },
-    // stander: '',
-    // customer: '',
 });
 
+
 export const queue_order = new Order({
+    customer: customer1._id,
+    stander: stander1._id,
     task: {
         kind: TaskType.Queueing,
-        location: {
-            country: 'Thailand',
-            zipcode: '10330',
-            province: 'Bangkok',
-            district: 'Pathum Wan',
-            subdistrict: 'Pathum Wan',
-            detail: 'some where',
-        },
-        datetime: Date.now(),
+        location: addrTable.pathum_wan,
+        datetime: Date.now() + 90000,
         size: PackageSize.Small,
-        detail: 'I hire you',
+        detail: 'I hire you to ...',
     },
-    status: OrderStatus.Pending,
-    // review: undefined,
+    orderStatus: [
+        { status: OrderStatus.Pending },
+    ],
     // trackStatus: [],
-    // stander: '',
-    // customer: '',
+    // review: undefined,
 });
