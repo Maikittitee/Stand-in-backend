@@ -16,9 +16,7 @@ export function validate_account(role: Role | undefined = undefined) {
         }
 
         const user = await Account.findOne({
-            user: {
-                username: req.auth.username,
-            },
+            user: req.auth.user_id,
             role: role,
         });
 
