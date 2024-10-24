@@ -5,7 +5,7 @@ import { Product, ProductModel, ProductVariant, Brand } from '../model/Product.j
 import { Store, Building } from '../model/Address.js';
 import { Stander } from '../model/Stander.js';
 import { convertQuery } from '../middleware/validator.js';
-import { convertOption } from '../service/index.js';
+import { convertSubdoc } from '../service/index.js';
 
 
 export default Router()
@@ -40,7 +40,7 @@ export default Router()
     const variants = await ProductVariant.find({
         product_model: { $in: filtered_models },
         price: { $gte: price_start || 0, $lte: price_end || Infinity },
-        ...convertOption(options)
+        ...convertSubdoc(options)
     });
 
     const products = await Product

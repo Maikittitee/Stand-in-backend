@@ -19,7 +19,19 @@ export default Router()
 
 .get('/cart', async (req: CustomerRequest, res) => {
     const customer = req.auth!.account;
-    const pop = await customer.populate('cart.product');
+    const pop = await customer.populate({
+        path: 'cart.product',
+        populate: [
+            {
+                path: 'store',
+                populate: 'building',
+            },
+            {
+                path: 'variant',
+                populate: 'product_model'
+            }
+        ],
+    });
 
     res.json(pop.cart);
 })

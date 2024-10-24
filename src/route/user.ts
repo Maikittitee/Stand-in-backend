@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { validate_jwt, validate_account } from '../middleware/auth.js';
-import bcrypt from "bcrypt";
+
 import { User } from '../model/User.js';
+import { Account } from '../model/Account.js';
+import { convertSubdoc } from '../service/index.js';
 
 
 export default Router()
@@ -21,14 +23,10 @@ export default Router()
 
 .post('/user', async (req: AccountRequest, res) => {
     const account = req.auth!.account;
-    let { username, email, password } = req.body;
     let user
 
     try {
-        if (password !== undefined) {
-            password = await bcrypt.hash(password, 10);
-        }
-        user = await User.findByIdAndUpdate(account.user, { username, email, password });
+        user = await User.findByIdAndUpdate(account.user, req.body)
     }
     catch (error) {
         res.status(400).end();
@@ -45,16 +43,19 @@ export default Router()
 })
 
 .post('/profile', async (req: AccountRequest, res) => {
-    const account = req.auth!.account;
+    const account_id = req.auth!.account_id;
 
+    let account;
     try {
-        account.profile = req.body;
-        account.save();
+        account = await Account.findByIdAndUpdate(
+            account_id, convertSubdoc(req.body, 'profile'),
+            { new: true }
+        );
     }
     catch (error) {
         res.status(400).end();
         return;
     }
 
-    res.json(account.profile);
+    res.json(account!.profile);
 })

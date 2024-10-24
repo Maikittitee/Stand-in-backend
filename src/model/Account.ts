@@ -3,6 +3,7 @@ import { addressSchema } from './Address.js';
 
 
 export enum Role {
+    Default,
     Customer,
     Stander,
 }
@@ -26,7 +27,7 @@ const profileSchema = new Schema({
     //     number: String;
     // }
 }, {
-    timestamps: true,
+    timestamps: { createdAt: false, updatedAt: true},
 });
 
 
@@ -38,7 +39,7 @@ export const accountSchema = new Schema({
     },
     profile: {
         type: profileSchema,
-        required: true,
+        default: {},
     },
     role: {
         type: Number,
