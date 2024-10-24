@@ -10,19 +10,13 @@ export default Router()
     .use(validate_jwt)
     .use(validate_account(Role.Customer))
 
-.get('/profile', async (req: CustomerRequest, res, next) => {
-	const customer = req.auth!.user;
-    const profile = await customer.populate(''); //?
-
-    res.json(profile);
-})
 
 .get('/history', async (req: CustomerRequest, res, next) => {
     const customer = req.auth!.user;
     const orders = await Order.find({ customer: customer._id });
 
     const ordersPop = orders.map(async (order) => {
-        if (order.task?.kind == TaskType.Shopping) {
+        if (order.task!.kind == TaskType.Shopping) {
             return await order.populate('store')
         }
         else {
@@ -35,13 +29,9 @@ export default Router()
 
 .get('/cart', async (req: CustomerRequest, res, next) => {
     const customer = req.auth!.user;
-    // customer.cart.find()?.populate('product');
+    const cart = await customer.populate('cart.product');
 
-    const cartPop = customer.cart.map(async (item: any) => {
-        return await item.populate('product');
-    });
-
-    res.json(cartPop);
+    res.json(cart);
 })
 
 .post('/cart', async (req: CustomerRequest, res, next) => {
@@ -77,7 +67,7 @@ export default Router()
 
 .get('/pay', async (req: CustomerRequest, res, next) => {
     const customer = req.auth!.user;
-    const { order_id } = req.query;
+    const { order: order_id } = req.query;
 
     const order = await Order.findById(order_id);
 
@@ -91,8 +81,30 @@ export default Router()
         return;
     }
 
-    order.status = OrderStatus.Paid;
+    order.orderStatus.push(
+        { status: OrderStatus.Paid }
+    );
     order.save();
 
-    res.json(order.status);
+    res.json(order.orderStatus);
+})
+
+.post('/order', async (req: CustomerRequest, res, next) => {
+    const customer = req.auth!.user;
+    const { stander, task } = req.body;
+    let order;
+
+    try {
+        order = await Order.create({
+            customer: customer._id,
+            stander: stander,
+            task: task,
+        });
+    }
+    catch (error) {
+        res.status(400);
+        return;
+    }
+
+    res.json(order);
 })

@@ -36,19 +36,7 @@ export default Router()
         return;
     }
 
-    const { name } = req.body;
     await order.save();
-
-    res.json(order);
-})
-.patch('/order/:id', async (req, res, next) => {
-    const { id } = req.params;
-    const order = await Order.findById(id); // ...
-
-    if (order == null) {
-        res.status(404);
-        return;
-    }
 
     res.json(order);
 })

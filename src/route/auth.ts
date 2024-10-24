@@ -1,37 +1,56 @@
 import 'dotenv/config';
 import express, { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
-import User from "../model/User.js"; // Ensure User is correctly typed in User.ts
 import jwt from 'jsonwebtoken';
+import User from "../model/User.js";
+import { Role } from "../model/Account.js";
+import { Customer } from '../model/Customer.js';
+import { Stander } from '../model/Stander.js';
+import { Account } from '../model/Account.js';
 
 
 interface SignUpRequestBody {
-	fullname: string;
 	username: string;
 	password: string;
 	email: string;
 }
 
+// @ts-ignore
+const roleMap = new Map<Role, typeof Account>([
+	[Role.Customer, Customer],
+	[Role.Stander, Stander],
+]);
+
 const router = express.Router();
 
 router.post('/sign-up', async (req: Request, res: Response) => {
+	const { user: user_data, role } = req.body as { user: SignUpRequestBody, role: Role};
+	const AccountModel = roleMap.get(role);
+
+	if (AccountModel == null) {
+		res.status(400);
+		return;
+	}
+
 	try {
-		const { fullname, username, password, email } = req.body;
+		const user = await User.create({
+			username: user_data.username,
+			password: await bcrypt.hash(user_data.password, 10),
+			email: user_data.email,
+		});
 
-		const password_hashed = await bcrypt.hash(password, 10);
+		const account = await AccountModel.create({ user: user._id });
 
-		const user_data = {
-			fullname,
-			username,
-			password: password_hashed,
-			email,
-		};
+		const token = jwt.sign(
+			user._id,
+			process.env.SECRET,
+			{ expiresIn: "1h" }
+		);
 
-		const user = await User.create(user_data);
-		res.json(user);
-
-	} catch (error) {
-		res.json({ error });
+		res.json({ token });
+	}
+	catch (error) {
+		res.status(400).json({ error });
 	}
 });
 
@@ -47,7 +66,6 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 			return;
 		}
 
-		console.log(user_data);
 		const match = await bcrypt.compare(password, user_data.password);
 		if (!match) {
 			res.status(400).json({
@@ -57,8 +75,8 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 		}
 
 		const token = jwt.sign(
-			user_data.username,
-			process.env.JWT_SECRET,
+			user_data._id,
+			process.env.SECRET,
 			{ expiresIn: "1h" }
 		);
 

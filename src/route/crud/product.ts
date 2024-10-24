@@ -98,7 +98,7 @@ export default Router()
 })
 
 
-.post('/product', async (req, res, next) => {
+.post('/shoppingProduct', async (req, res, next) => {
     let product;
     try {
         product = await Product.create(req.body);
@@ -110,9 +110,21 @@ export default Router()
 
     res.json(product);
 })
-.get('/product/:id', async (req, res, next) => {
+.get('/shoppingProduct/:id', async (req, res, next) => {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product
+        .findById(id)
+        .populate({
+            path: 'store',
+            populate: 'building',
+        })
+        .populate({
+            path: 'variant',
+            populate: {
+                path: 'product_model',
+                populate: 'brand',
+            }
+        });
 
     if (product == null) {
         res.status(404);
@@ -121,7 +133,7 @@ export default Router()
 
     res.json(product);
 })
-.put('/product/:id', async (req, res, next) => {
+.put('/shoppingProduct/:id', async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findByIdAndUpdate(id, req.body);
 
@@ -132,7 +144,7 @@ export default Router()
 
     res.json(product);
 })
-.delete('/product/:id', async (req, res, next) => {
+.delete('/shoppingProduct/:id', async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
 

@@ -4,11 +4,15 @@ import * as fuzz from 'fuzzball';
 import { Product, ProductModel, ProductVariant, Brand } from '../model/Product.js';
 import { Store, Building } from '../model/Address.js';
 import { Stander } from '../model/Stander.js';
+import { convertQuery } from '../middleware/validator.js';
+import { convertOption } from '../service/index.js';
+
 
 export default Router()
+    .use(convertQuery)
 
 
-.get('/product', async (req, res, next) => {
+.get('/shoppingProducts', async (req, res, next) => {
     const {
         name,
         store_id,
@@ -16,60 +20,46 @@ export default Router()
         category,
         price_start,
         price_end,
-        ...option // color, size, etc.
+        sortby,
+        ...options // color, size, etc.
     } = req.query;
 
-    const filterd_variants = await ProductVariant
-        .find({
-            price: { $gte: price_start, $lte: price_end },
-            // option: option,
-        })
-        .populate('product_model')
-        .find({
-            product_model: {
-                brand: brand_id,
-                category: category,
-            }
-        });
+    const models = await ProductModel.find({
+        brand: brand_id,
+        category: category,
+    });
 
-    // @ts-expect-error
-    const filtered_models: TModel[] = filterd_variants.map(variant => variant.product_model);
-    console.log(filtered_models);
-
-    const models_id = fuzz
-        .extract(name, filtered_models, {
+    const filtered_models = fuzz
+        .extract(name, models, {
             scorer: fuzz.partial_ratio,
             processor: model => model.name,
             cutoff: 50,
         })
         .map(r => r[0]._id);
-    console.log(models_id);
+
+    const variants = await ProductVariant.find({
+        product_model: { $in: filtered_models },
+        price: { $gte: price_start || 0, $lte: price_end || Infinity },
+        ...convertOption(options)
+    });
 
     const products = await Product
         .find({
             store: store_id,
-            product_model: { $in: models_id },
-            subproducts: {
-                $elemMatch: {
-                    variant: { $in: filterd_variants },
-                    available: true,
-                }
-            }
+            variant: { $in: variants.map(v => v._id) },
+            available: true,
         })
-        .populate([
-            {
-                path: 'store',
-                populate: 'building',
-            },
-            {
+        .populate({
+            path: 'store',
+            populate: 'building',
+        })
+        .populate({
+            path: 'variant',
+            populate: {
                 path: 'product_model',
                 populate: 'brand',
-            },
-            {
-                path: 'subproducts',
-                populate: 'variant',
             }
-        ]);
+        });
 
     res.json(products);
 })
@@ -77,18 +67,22 @@ export default Router()
 .get('/stander', async (req, res, next) => {
     const { name, location, product } = req.query;
 
-    const filterd_standers = await Stander.find({
-        service: {
-            location: location,
-            product: product, //?
-        }
-    });
+    let standers = await Stander
+        .find({
+            // service: {
+            //     location: location,
+            //     product: product, //?
+            // }
+        })
+        .sort({ 'service.rating': -1 });
 
-    const standers = fuzz.extract(name, filterd_standers, {
-        scorer: fuzz.partial_ratio,
-        processor: stander => stander.name,
-        cutoff: 50,
-    }).map(r => r[0]);
+    if (name) {
+        standers = fuzz.extract(name, standers, {
+            scorer: fuzz.partial_ratio,
+            processor: stander => stander.name,
+            cutoff: 50,
+        }).map(r => r[0]);
+    }
 
     res.json(standers);
 })
