@@ -37,13 +37,13 @@ export const standerSchema = new Schema({
             const orders: TOrder[] = await this.getHistory();
             const hasReview = orders.filter(order => order.review !== undefined);
 
-            if (hasReview.length == 0) {
+            if (hasReview.length === 0) {
                 return;
             }
 
             const sum = hasReview.reduce((s, order) => s + order.review!.rating, 0);
 
-            if (sum == 0) {
+            if (sum === 0) {
                 return 0;
             }
 

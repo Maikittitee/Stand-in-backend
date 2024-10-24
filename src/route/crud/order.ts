@@ -20,7 +20,7 @@ export default Router()
     const { id } = req.params;
     const order = await Order.findById(id);
 
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
@@ -31,7 +31,7 @@ export default Router()
     const { id } = req.params;
     const order = await Order.findById(id); // ...
 
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }
@@ -44,7 +44,7 @@ export default Router()
     const { id } = req.params;
     const order = await Order.findByIdAndDelete(id);
 
-    if (order == null) {
+    if (order === null) {
         res.status(404);
         return;
     }

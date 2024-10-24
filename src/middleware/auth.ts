@@ -10,7 +10,7 @@ export const validate_jwt: middleware = expressjwt({
 
 export function validate_account(role: Role | undefined = undefined) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        if (req.auth == undefined) {
+        if (req.auth === undefined) {
             res.status(401);
             return;
         }
@@ -20,7 +20,7 @@ export function validate_account(role: Role | undefined = undefined) {
             role: role,
         });
 
-        if (user == null) {
+        if (user === null) {
             res.status(401);
             return;
         }

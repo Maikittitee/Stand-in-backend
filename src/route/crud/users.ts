@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import User from "../../model/User.js"; // Assuming User is already typed in User.ts
+import { User } from "../../model/User.js"; // Assuming User is already typed in User.ts
 
 const router = express.Router();
 

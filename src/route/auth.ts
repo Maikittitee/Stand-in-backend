@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import User from "../model/User.js";
+import { User } from "../model/User.js";
 import { Role } from "../model/Account.js";
 import { Customer } from '../model/Customer.js';
 import { Stander } from '../model/Stander.js';
@@ -21,13 +21,14 @@ const roleMap = new Map<Role, typeof Account>([
 	[Role.Stander, Stander],
 ]);
 
+
 const router = express.Router();
 
 router.post('/sign-up', async (req: Request, res: Response) => {
 	const { user: user_data, role } = req.body as { user: SignUpRequestBody, role: Role};
 	const AccountModel = roleMap.get(role);
 
-	if (AccountModel == null) {
+	if (AccountModel === undefined) {
 		res.status(400);
 		return;
 	}
@@ -59,7 +60,7 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 		const { username, password } = req.body as { username: string; password: string };
 
 		const user_data = await User.findOne({ username });
-		if (user_data == null) {
+		if (user_data === null) {
 			res.status(400).json({
 				message: "Login Failed (user not found)"
 			});

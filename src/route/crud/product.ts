@@ -20,7 +20,7 @@ export default Router()
     const { id } = req.params;
     const brand = await Brand.findById(id);
 
-    if (brand == null) {
+    if (brand === null) {
         res.status(404);
         return;
     }
@@ -31,7 +31,7 @@ export default Router()
     const { id } = req.params;
     const brand = await Brand.findByIdAndUpdate(id, req.body);
 
-    if (brand == null) {
+    if (brand === null) {
         res.status(404);
         return;
     }
@@ -42,7 +42,7 @@ export default Router()
     const { id } = req.params;
     const brand = await Brand.findByIdAndDelete(id);
 
-    if (brand == null) {
+    if (brand === null) {
         res.status(404);
         return;
     }
@@ -67,7 +67,7 @@ export default Router()
     const { id } = req.params;
     const model = await ProductModel.findById(id);
 
-    if (model == null) {
+    if (model === null) {
         res.status(404);
         return;
     }
@@ -78,7 +78,7 @@ export default Router()
     const { id } = req.params;
     const model = await ProductModel.findByIdAndUpdate(id, req.body);
 
-    if (model == null) {
+    if (model === null) {
         res.status(404);
         return;
     }
@@ -89,7 +89,7 @@ export default Router()
     const { id } = req.params;
     const model = await ProductModel.findByIdAndDelete(id);
 
-    if (model == null) {
+    if (model === null) {
         res.status(404);
         return;
     }
@@ -126,7 +126,7 @@ export default Router()
             }
         });
 
-    if (product == null) {
+    if (product === null) {
         res.status(404);
         return;
     }
@@ -137,7 +137,7 @@ export default Router()
     const { id } = req.params;
     const product = await Product.findByIdAndUpdate(id, req.body);
 
-    if (product == null) {
+    if (product === null) {
         res.status(404);
         return;
     }
@@ -148,7 +148,7 @@ export default Router()
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
 
-    if (product == null) {
+    if (product === null) {
         res.status(404);
         return;
     }
