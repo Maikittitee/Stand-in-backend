@@ -1,13 +1,11 @@
 import 'dotenv/config';
 import express, { Request, Response } from "express";
-import { Model } from 'mongoose';
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 
 import { User } from "../model/User.js";
 import { Account, Role } from "../model/Account.js";
-import { Customer } from '../model/Customer.js';
-import { Stander } from '../model/Stander.js';
+import { roleMap } from '../middleware/auth.js';
 
 
 interface SignUpRequestBody {
@@ -15,11 +13,6 @@ interface SignUpRequestBody {
     password: string;
     email: string;
 }
-
-const roleMap = new Map<Role, Model<any>>([
-    [Role.Customer, Customer],
-    [Role.Stander, Stander],
-]);
 
 
 const router = express.Router();
@@ -33,13 +26,9 @@ router.post('/sign-up', async (req: Request, res: Response) => {
         return;
     }
 
-    let user;
+    let user: TUser;
     try {
-        user = await User.create({
-            username: user_body.username,
-            password: await bcrypt.hash(user_body.password, 10),
-            email: user_body.email,
-        });
+        user = await User.create(user_body);
     }
     catch (error) {
         res.status(400).json({ error });

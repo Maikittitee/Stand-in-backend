@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 
 export const userSchema = new Schema({
@@ -10,6 +11,7 @@ export const userSchema = new Schema({
     password: {
         type: String,
         required: true,
+        set: p => bcrypt.hashSync(p, 10),
     },
     email: {
         type: String,

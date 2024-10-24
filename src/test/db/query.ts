@@ -75,7 +75,6 @@ const query = [
 ]
 const options = {
     scorer: fuzz.partial_ratio,
-    // @ts-expect-error
     processor: d => d.name,
     cutoff: 50,
 }
