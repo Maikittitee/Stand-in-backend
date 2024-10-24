@@ -9,4 +9,5 @@ declare global {
     type AuthRequest<U> = JwtRequest<{ user: U }>;
     type StanderRequest = AuthRequest<TStander>;
     type CustomerRequest = AuthRequest<TCustomer>;
+    type AccountRequest = AuthRequest<TAccount>;
 }

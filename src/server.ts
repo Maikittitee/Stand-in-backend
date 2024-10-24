@@ -9,7 +9,9 @@ const uri = process.env.ATLAS_URI;
 const PORT = process.env.PORT || 3000;
 
 
-mongoose.connect(uri)
+// https://www.mongodb.com/docs/drivers/node/current/fundamentals/bson/undefined-values/
+// ignore undefined fields when Model.find()
+mongoose.connect(uri, { ignoreUndefined: true })
     .then(() => console.log("Mongo connected"))
     .catch((error) => console.error("Mongo connection error:", error));
 
