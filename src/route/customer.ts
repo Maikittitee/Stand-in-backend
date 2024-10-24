@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { validate_jwt, validate_account } from '../middleware/auth.js';
 
 import { Order, OrderStatus } from '../model/Order.js';
-import { TaskType } from '../model/Task.js';
 import { Role } from '../model/Account.js';
 
 
@@ -12,21 +11,21 @@ export default Router()
 
 
 .get('/history', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
     const history = await customer.getHistory();
 
     res.json(history);
 })
 
 .get('/cart', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
-    const customerPop = await customer.populate('cart.product');
+    const customer = req.auth!.account;
+    const pop = await customer.populate('cart.product');
 
-    res.json(customerPop.cart);
+    res.json(pop.cart);
 })
 
 .post('/cart', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
 
     customer.cart.push(req.body);
     customer.save();
@@ -35,19 +34,19 @@ export default Router()
 })
 
 .post('/order/:id/review', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.customer !== customer._id) {
-        res.status(403);
+        res.status(403).end();
         return;
     }
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Completed) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -58,19 +57,19 @@ export default Router()
 })
 
 .get('/order/:id/pay', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.customer !== customer._id) {
-        res.status(403);
+        res.status(403).end();
         return;
     }
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Accepted) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -81,19 +80,19 @@ export default Router()
 })
 
 .post('/order/:id/cancel', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.customer !== customer._id) {
-        res.status(403);
+        res.status(403).end();
         return;
     }
     if (order.orderStatus.at(-1)!.status >= OrderStatus.Paid) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -104,20 +103,20 @@ export default Router()
 })
 
 .post('/order/:id/stander', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
     const { stander } = req.body;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.customer !== customer._id) {
-        res.status(403);
+        res.status(403).end();
         return;
     }
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Rejected) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -129,7 +128,7 @@ export default Router()
 })
 
 .post('/order', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.user;
+    const customer = req.auth!.account;
     const { stander, task } = req.body;
     let order;
 
@@ -141,7 +140,7 @@ export default Router()
         });
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 

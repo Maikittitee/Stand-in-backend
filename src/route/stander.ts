@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { validate_jwt, validate_account } from '../middleware/auth.js';
 
 import { Order, OrderStatus, TrackStatus } from '../model/Order.js';
-import { TaskType } from '../model/Task.js';
 import { Role } from '../model/Account.js';
 
 
@@ -12,26 +11,26 @@ export default Router()
 
 
 .get('/history', async (req: StanderRequest, res) => {
-    const stander = req.auth!.user;
+    const stander = req.auth!.account;
     const history = await stander.getHistory();
 
     res.json(history);
 })
 
 .post('/order/:id/accept', async (req: StanderRequest, res) => {
-    const stander = req.auth!.user;
+    const stander = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.stander !== stander._id) {
-        res.status(401);
+        res.status(401).end();
         return;
     }
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Pending) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -42,19 +41,19 @@ export default Router()
 })
 
 .post('/order/:id/reject', async (req: StanderRequest, res) => {
-    const stander = req.auth!.user;
+    const stander = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.stander !== stander._id) {
-        res.status(401);
+        res.status(401).end();
         return;
     }
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Pending) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -65,15 +64,15 @@ export default Router()
 })
 
 .post('/order/:id/tracking', async (req: StanderRequest, res) => {
-    const stander = req.auth!.user;
+    const stander = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
     if (order.stander !== stander._id) {
-        res.status(401);
+        res.status(401).end();
         return;
     }
 

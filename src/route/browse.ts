@@ -12,7 +12,7 @@ export default Router()
     .use(convertQuery)
 
 
-.get('/shoppingProducts', async (req, res, next) => {
+.get('/product', async (req, res) => {
     const {
         name,
         store_id,
@@ -64,7 +64,7 @@ export default Router()
     res.json(products);
 })
 
-.get('/stander', async (req, res, next) => {
+.get('/stander', async (req, res) => {
     const { name, location, product } = req.query;
 
     const filtered_standers = await Stander.find({
@@ -100,7 +100,7 @@ export default Router()
     res.json(standers);
 })
 
-.get('/store', async (req, res, next) => {
+.get('/store', async (req, res) => {
     const { name } = req.query;
     const all_store = await Store.find();
 
@@ -113,7 +113,7 @@ export default Router()
     res.json(stores);
 })
 
-.get('/building', async (req, res, next) => {
+.get('/building', async (req, res) => {
     const { name } = req.query;
     const all_building = await Building.find({
         name: { $exists: true },
@@ -128,7 +128,7 @@ export default Router()
     res.json(buildings);
 })
 
-.get('/brand', async (req, res, next) => {
+.get('/brand', async (req, res) => {
     const { name } = req.query;
     const all_brand = await Brand.find();
 
@@ -141,7 +141,7 @@ export default Router()
     res.json(brands);
 })
 
-.get('/product_model', async (req, res, next) => {
+.get('/product_model', async (req, res) => {
     const { name } = req.query;
     const all_model = await ProductModel.find();
 

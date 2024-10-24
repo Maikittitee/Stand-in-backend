@@ -10,7 +10,7 @@ export default Router()
         store = await Store.create(req.body);
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -21,7 +21,7 @@ export default Router()
     const store = await Store.findById(id);
 
     if (store === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -32,7 +32,7 @@ export default Router()
     const store = await Store.findByIdAndUpdate(id, req.body);
 
     if (store === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -43,7 +43,7 @@ export default Router()
     const store = await Store.findByIdAndDelete(id);
 
     if (store === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -57,7 +57,7 @@ export default Router()
         building = await Building.create(req.body);
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -68,7 +68,7 @@ export default Router()
     const building = await Building.findById(id);
 
     if (building === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -79,7 +79,7 @@ export default Router()
     const building = await Building.findByIdAndUpdate(id, req.body);
 
     if (building === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -90,7 +90,7 @@ export default Router()
     const building = await Building.findByIdAndDelete(id);
 
     if (building === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 

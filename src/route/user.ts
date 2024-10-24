@@ -10,7 +10,7 @@ export default Router()
 
 
 .get('/user', async (req: AccountRequest, res) => {
-    const account = req.auth!.user;
+    const account = req.auth!.account;
     const user = (await User.findById(account.user))!;
 
     res.json({
@@ -20,19 +20,18 @@ export default Router()
 })
 
 .post('/user', async (req: AccountRequest, res) => {
-    const account = req.auth!.user;
-    const { username, email } = req.body;
-
+    const account = req.auth!.account;
+    let { username, email, password } = req.body;
     let user
+
     try {
-        user = await User.findByIdAndUpdate(account.user, {
-            username,
-            email,
-            // password: await bcrypt.hash(user_data.password, 10),
-        });
+        if (password !== undefined) {
+            password = await bcrypt.hash(password, 10);
+        }
+        user = await User.findByIdAndUpdate(account.user, { username, email, password });
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -40,20 +39,20 @@ export default Router()
 })
 
 .get('/profile', async (req: AccountRequest, res) => {
-    const account = req.auth!.user;
+    const account = req.auth!.account;
 
     res.json(account.profile);
 })
 
 .post('/profile', async (req: AccountRequest, res) => {
-    const account = req.auth!.user;
+    const account = req.auth!.account;
 
     try {
         account.profile = req.body;
         account.save();
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 

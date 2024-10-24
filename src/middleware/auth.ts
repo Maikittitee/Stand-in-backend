@@ -8,24 +8,24 @@ export const validate_jwt: middleware = expressjwt({
     algorithms: ['HS256'] // default 'jsonwebtoken' algorithm, HMAC SHA256
 });
 
-export function validate_account(role: Role | undefined = undefined) {
+export function validate_account(role?: Role) {
     return async (req: Request, res: Response, next: NextFunction) => {
         if (req.auth === undefined) {
-            res.status(401);
+            res.status(401).end();
             return;
         }
 
-        const user = await Account.findOne({
-            user: req.auth.user_id,
-            role: role,
+        const account = await Account.findOne({
+            _id: req.auth.account_id,
+            role: role
         });
 
-        if (user === null) {
-            res.status(401);
+        if (account === null) {
+            res.status(401).end();
             return;
         }
 
-        req.auth.user = user;
+        req.auth.account = account;
         next();
     }
 }

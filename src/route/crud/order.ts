@@ -10,7 +10,7 @@ export default Router()
         order = await Order.create(req.body);
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -21,7 +21,7 @@ export default Router()
     const order = await Order.findById(id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -29,14 +29,12 @@ export default Router()
 })
 .put('/order/:id', async (req, res, next) => {
     const { id } = req.params;
-    const order = await Order.findById(id); // ...
+    const order = await Order.findByIdAndUpdate(id, req.body);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
-
-    await order.save();
 
     res.json(order);
 })
@@ -45,7 +43,7 @@ export default Router()
     const order = await Order.findByIdAndDelete(id);
 
     if (order === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 

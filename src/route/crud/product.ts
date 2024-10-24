@@ -10,7 +10,7 @@ export default Router()
         brand = await Brand.create(req.body);
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -21,7 +21,7 @@ export default Router()
     const brand = await Brand.findById(id);
 
     if (brand === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -32,7 +32,7 @@ export default Router()
     const brand = await Brand.findByIdAndUpdate(id, req.body);
 
     if (brand === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -43,7 +43,7 @@ export default Router()
     const brand = await Brand.findByIdAndDelete(id);
 
     if (brand === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -57,7 +57,7 @@ export default Router()
         model = await ProductModel.create(req.body);
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
@@ -68,7 +68,7 @@ export default Router()
     const model = await ProductModel.findById(id);
 
     if (model === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -79,7 +79,7 @@ export default Router()
     const model = await ProductModel.findByIdAndUpdate(id, req.body);
 
     if (model === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -90,7 +90,7 @@ export default Router()
     const model = await ProductModel.findByIdAndDelete(id);
 
     if (model === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
@@ -98,19 +98,19 @@ export default Router()
 })
 
 
-.post('/shoppingProduct', async (req, res, next) => {
+.post('/product', async (req, res, next) => {
     let product;
     try {
         product = await Product.create(req.body);
     }
     catch (error) {
-        res.status(400);
+        res.status(400).end();
         return;
     }
 
     res.json(product);
 })
-.get('/shoppingProduct/:id', async (req, res, next) => {
+.get('/product/:id', async (req, res, next) => {
     const { id } = req.params;
     const product = await Product
         .findById(id)
@@ -127,29 +127,29 @@ export default Router()
         });
 
     if (product === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
     res.json(product);
 })
-.put('/shoppingProduct/:id', async (req, res, next) => {
+.put('/product/:id', async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findByIdAndUpdate(id, req.body);
 
     if (product === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
     res.json(product);
 })
-.delete('/shoppingProduct/:id', async (req, res, next) => {
+.delete('/product/:id', async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
 
     if (product === null) {
-        res.status(404);
+        res.status(404).end();
         return;
     }
 
