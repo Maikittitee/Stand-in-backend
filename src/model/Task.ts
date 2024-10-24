@@ -4,19 +4,19 @@ import { addressSchema } from './Address.js';
 
 
 export enum TaskType {
-    Queueing = 'Queueing',
-    Shopping = 'Shopping',
+    Queueing,
+    Shopping,
 }
 export enum PackageSize {
-    Small,
-    Medium,
-    Laege,
+    Small = 's',
+    Medium = 'm',
+    Laege = 'l',
 }
 
 
 export const taskSchema = new Schema({
     kind: {
-        type: String,
+        type: Number,
         enum: TaskType,
         required: true,
     },
@@ -36,7 +36,7 @@ export const queueingSchema = new Schema({
         required: true,
     },
     size: {
-        type: Number,
+        type: String,
         enum: PackageSize,
         required: true,
     },

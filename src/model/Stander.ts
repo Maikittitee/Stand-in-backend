@@ -1,26 +1,18 @@
 import { Schema, model } from 'mongoose';
 import { Order } from './Order.js';
-import { PackageSize } from './Task.js';
-import { Account, accountOption } from './Account.js';
+import { Account, Role } from './Account.js';
 
 
-export const serviceSchema = new Schema({
+export const standerSchema = new Schema({
     queueing: {
         available: {
             type: Boolean,
             default: false,
-            required: true,
         },
-        pricing: [{
-            package: {
-                type: Number,
-                enum: PackageSize,
-            },
-            charge: {
-                type: Number,
-                required: true,
-            },
-        }],
+        charge: {
+            type: Map, // key should be PackageSize
+            of: Number
+        },
         description: {
             type: String,
         },
@@ -29,38 +21,37 @@ export const serviceSchema = new Schema({
         available: {
             type: Boolean,
             default: false,
-            required: true,
         },
         charge: {
             type: Number,
             required: true,
         },
     },
-    stander: {
-        type: Schema.Types.ObjectId,
-        ref: 'Stander',
-        required: true,
-    },
-});
-
-
-export const standerSchema = new Schema({
-    commission: {
-        type: Schema.Types.ObjectId,
-        ref: 'Commission',
-        required: true,
-    },
 }, {
-    virtuals: {
-        history: {
-            get() {
-                return Order.find({ stander: this._id });
+    methods: {
+        async getHistory() {
+            return await Order.find({ stander: this._id });
+        },
+        async getScore() {
+            // @ts-ignore
+            const orders: TOrder[] = await this.getHistory();
+            const hasReview = orders.filter(order => order.review !== undefined);
+
+            if (hasReview.length == 0) {
+                return;
             }
+
+            const sum = hasReview.reduce((s, order) => s + order.review!.rating, 0);
+
+            if (sum == 0) {
+                return 0;
+            }
+
+            return sum / orders.length;
         },
     },
-    // ...accountOption,
 });
 
 
-export const Service = model('Service', serviceSchema);
-export const Stander = Account.discriminator('Stander', standerSchema);
+// @ts-ignore
+export const Stander: ModelFromSchema<TStanderSchema> = Account.discriminator(Role.Stander, standerSchema);

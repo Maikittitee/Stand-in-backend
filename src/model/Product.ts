@@ -57,9 +57,10 @@ export const variantSchema = new Schema({
     description: {
         type: String,
     },
-    option: {
+    options: {
         type: Map,
         of: String,
+        default: {},
     }
 });
 
@@ -77,7 +78,6 @@ export const productSchema = new Schema({
     },
     available: {
         type: Boolean,
-        default: true,
         required: true,
     },
 });

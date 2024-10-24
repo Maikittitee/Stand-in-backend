@@ -8,28 +8,20 @@ export enum Role {
 }
 
 
-export const accountOption = {
-    timestamps: true,
-    discriminatorKey: 'role',
-}
-
-
 const profileSchema = new Schema({
     name: {
         type: String,
-        required: true,
     },
     image: {
         type: String,
     },
     phone: {
         type: String,
-        required: true,
     },
-    address: [{
-        label: String,
-        value: addressSchema,
-    }],
+    address: {
+        type: Map,
+        of: addressSchema,
+    },
     // creditcard?: {
     //     number: String;
     // }
@@ -50,10 +42,13 @@ export const accountSchema = new Schema({
     },
     role: {
         type: Number,
-        required: true,
         enum: Role,
+        required: true,
     },
-}, accountOption);
+}, {
+    timestamps: true,
+    discriminatorKey: 'role',
+});
 
 
 export function isStander(account: any): account is TStander {

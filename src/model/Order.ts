@@ -16,8 +16,14 @@ export enum TrackStatus {
     Arrived_at_store,
     Item_recieved,
     Package_sent,
-    In_transit,
+    Delivered,
 }
+
+
+const statusOption = {
+    _id: false,
+    timestamps: { createdAt: true, updatedAt: false },
+};
 
 
 const reviewSchema = new Schema({
@@ -36,29 +42,25 @@ const reviewSchema = new Schema({
 });
 
 
-export const orderSchema = new Schema({
-    task: {
-        type: taskSchema,
-        required: true,
-    },
+const orderStatusSchema = new Schema({
     status: {
         type: Number,
         enum: OrderStatus,
-        default: OrderStatus.Pending,
         required: true,
     },
-    trackStatus: [{
-        _id: false,
-        datetime: {
-            type: Date,
-            required: true,
-        },
-        status: {
-            type: Number,
-            enum: TrackStatus,
-            required: true,
-        },
-    }],
+}, statusOption);
+
+
+const trackStatusSchema = new Schema({
+    status: {
+        type: Number,
+        enum: TrackStatus,
+        required: true,
+    },
+}, statusOption);
+
+
+export const orderSchema = new Schema({
     customer: {
         type: Schema.Types.ObjectId,
         ref: 'Customer',
@@ -69,6 +71,15 @@ export const orderSchema = new Schema({
         ref: 'Stander',
         required: true,
     },
+    task: {
+        type: taskSchema,
+        required: true,
+    },
+    orderStatus: {
+        type: [orderStatusSchema],
+        default: [{ status: OrderStatus.Pending }],
+    },
+    trackStatus: [trackStatusSchema],
     review: reviewSchema,
 }, {
     timestamps: true,
