@@ -21,7 +21,6 @@ router.post('/sign-up', async (req: Request, res: Response) => {
     const { role, ...user_body } = req.body as { role: Role } & SignUpRequestBody;
     const AccountModel = roleMap.get(role);
 
-    console.log({ role, user_body });
     if (AccountModel === undefined) {
         res.status(400).end();
         return;

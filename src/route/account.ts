@@ -38,6 +38,12 @@ export default Router()
     });
 })
 
+.get('/id', async (req: AccountRequest, res) => {
+    const account_id = req.auth!.account_id;
+
+    res.json(account_id);
+})
+
 .get('/profile', async (req: AccountRequest, res) => {
     const account = req.auth!.account;
 

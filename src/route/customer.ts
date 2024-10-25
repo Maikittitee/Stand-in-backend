@@ -151,7 +151,7 @@ export default Router()
         });
     }
     catch (error) {
-        res.status(400).end();
+        res.status(400).json({ error });
         return;
     }
 
