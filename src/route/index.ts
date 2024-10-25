@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import product from './crud/product.js';
 import order from './crud/order.js';
 import address from './crud/address.js';
@@ -10,11 +11,11 @@ import auth from './auth.js';
 
 
 export default Router()
-    .use(product)
-    .use(address)
-    .use(order)
+    // .use(product)
+    // .use(address)
+    // .use(order)
     .use('/auth', auth)
-    .use('/my', user)
+    .use('/user', user)
     .use('/customer', customer)
     .use('/stander', stander)
     .use('/browse', browse)

@@ -1,5 +1,6 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, InferSchemaType, Types } from 'mongoose';
 import { TaskType, taskSchema, queueingSchema, shoppingSchema } from './Task.js';
+import { Stander } from './Stander.js';
 
 
 export enum OrderStatus {
@@ -83,6 +84,37 @@ export const orderSchema = new Schema({
     review: reviewSchema,
 }, {
     timestamps: true,
+    methods: {
+        async getPrice() {
+            const tasktype: TaskType = this.task.kind;
+            const stander = await Stander.findById(this.stander);
+
+            if (tasktype === TaskType.Queueing) {
+                // @ts-ignore
+                const task: InferSchemaType<TQueueingSchema> = this.task;
+                const pricing = stander!.queueing!.charge;
+                const charge: number = pricing.get(task.size)!;
+
+                return charge;
+            }
+            // return 3;
+
+            else if (tasktype === TaskType.Shopping) {
+                // @ts-ignore
+                const task: InferSchemaType<TShoppingSchema> = this.task;
+                const Itemprice = task.items.reduce((s, item) => {
+                    // @ts-ignore
+                    const price: number = item.getPrice();
+
+                    return s + price;
+                }, 0);
+
+                const charge: number = stander!.shopping!.charge;
+
+                return charge + Itemprice;
+            }
+        },
+    },
 });
 
 const taskPath = orderSchema.path<Schema.Types.Subdocument>('task');

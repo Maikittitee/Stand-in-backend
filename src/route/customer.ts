@@ -142,10 +142,9 @@ export default Router()
 .post('/order', async (req: CustomerRequest, res) => {
     const customer = req.auth!.account;
     const { stander, task } = req.body;
-    let order;
 
     try {
-        order = await Order.create({
+        var order = await Order.create({
             customer: customer._id,
             stander: stander,
             task: task,

@@ -24,21 +24,23 @@ export default Router()
         ...options // color, size, etc.
     } = req.query;
 
-    const models = await ProductModel.find({
+    let models = await ProductModel.find({
         brand: brand_id,
         category: category,
     });
 
-    const filtered_models = fuzz
-        .extract(name, models, {
-            scorer: fuzz.partial_ratio,
-            processor: model => model.name,
-            cutoff: 50,
-        })
-        .map(r => r[0]._id);
+    if (name) {
+        models = fuzz
+            .extract(name, models, {
+                scorer: fuzz.partial_ratio,
+                processor: model => model.name,
+                cutoff: 50,
+            })
+            .map(r => r[0]);
+    }
 
     const variants = await ProductVariant.find({
-        product_model: { $in: filtered_models },
+        product_model: { $in: models.map(m => m._id) },
         price: { $gte: price_start || 0, $lte: price_end || Infinity },
         ...convertSubdoc(options)
     });
@@ -62,6 +64,24 @@ export default Router()
         });
 
     res.json(products);
+})
+
+.get('/product/:id', async (req, res) => {
+    const product = await Product
+        .findById(req.params.id)
+        .populate({
+            path: 'store',
+            populate: 'building',
+        })
+        .populate({
+            path: 'variant',
+            populate: {
+                path: 'product_model',
+                populate: 'brand',
+            }
+        });
+
+    res.json(product);
 })
 
 .get('/stander', async (req, res) => {
@@ -98,6 +118,12 @@ export default Router()
     }
 
     res.json(standers);
+})
+
+.get('/stander/:id', async (req, res) => {
+    const stander = await Stander.findById(req.params.id);
+
+    res.json(stander);
 })
 
 .get('/store', async (req, res) => {

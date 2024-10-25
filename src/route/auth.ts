@@ -18,17 +18,17 @@ interface SignUpRequestBody {
 const router = express.Router();
 
 router.post('/sign-up', async (req: Request, res: Response) => {
-    const { user: user_body, role } = req.body as { user: SignUpRequestBody, role: Role };
+    const { role, ...user_body } = req.body as { role: Role } & SignUpRequestBody;
     const AccountModel = roleMap.get(role);
 
+    console.log({ role, user_body });
     if (AccountModel === undefined) {
         res.status(400).end();
         return;
     }
 
-    let user: TUser;
     try {
-        user = await User.create(user_body);
+        var user = await User.create(user_body);
     }
     catch (error) {
         res.status(400).json({ error });

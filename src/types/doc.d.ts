@@ -24,7 +24,7 @@ type CombinedSchema<SchemaA extends Schema, SchemaB extends Schema> = Schema<
 
 
 declare global {
-    // from mongoose model() function
+    // mimick from mongoose model() function
     type ModelFromSchema<TSchema extends Schema> = Model<
         InferSchemaType<TSchema>,
         ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
@@ -38,16 +38,19 @@ declare global {
         TSchema
     > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-
-    type TUser              = HydratedDocumentFromSchema<typeof userSchema>;
-    type TAccount           = HydratedDocumentFromSchema<typeof accountSchema>;
     type TCustomerSchema    = CombinedSchema<typeof accountSchema, typeof customerSchema>;
     type TStanderSchema     = CombinedSchema<typeof accountSchema, typeof standerSchema>;
+    type TQueueingSchema    = CombinedSchema<typeof taskSchema, typeof queueingSchema>
+    type TShoppingSchema    = CombinedSchema<typeof taskSchema, typeof shoppingSchema>
 
-    type TCustomer          = HydratedDocumentFromSchema<TCustomerSchema>;
-    type TStander           = HydratedDocumentFromSchema<TStanderSchema>;
-    type TQueueing          = HydratedDocumentFromSchema<CombinedSchema<typeof taskSchema, typeof queueingSchema>>;
-    type TShopping          = HydratedDocumentFromSchema<CombinedSchema<typeof taskSchema, typeof shoppingSchema>>;
+    type TUser              = HydratedDocumentFromSchema<typeof userSchema>;
     type TProductModel      = HydratedDocumentFromSchema<typeof modelSchema>;
     type TOrder             = HydratedDocumentFromSchema<typeof orderSchema>;
+
+    type TAccount           = HydratedDocumentFromSchema<typeof accountSchema>;
+    type TCustomer          = HydratedDocumentFromSchema<TCustomerSchema>;
+    type TStander           = HydratedDocumentFromSchema<TStanderSchema>;
+
+    type TQueueing          = HydratedDocumentFromSchema<TQueueingSchema>;
+    type TShopping          = HydratedDocumentFromSchema<TShoppingSchema>;
 }

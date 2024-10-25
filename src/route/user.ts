@@ -11,29 +11,31 @@ export default Router()
     .use(validate_account())
 
 
-.get('/user', async (req: AccountRequest, res) => {
+.get('/', async (req: AccountRequest, res) => {
     const account = req.auth!.account;
-    const user = (await User.findById(account.user))!;
+    const user = await User.findById(account.user);
 
     res.json({
-        username: user.username,
-        email: user.email,
+        username: user!.username,
+        email: user!.email,
     });
 })
 
-.post('/user', async (req: AccountRequest, res) => {
+.post('/', async (req: AccountRequest, res) => {
     const account = req.auth!.account;
-    let user
 
     try {
-        user = await User.findByIdAndUpdate(account.user, req.body)
+        var user = await User.findByIdAndUpdate(account.user, req.body)
     }
     catch (error) {
         res.status(400).end();
         return;
     }
 
-    res.json(user);
+    res.json({
+        username: user!.username,
+        email: user!.email,
+    });
 })
 
 .get('/profile', async (req: AccountRequest, res) => {
@@ -45,9 +47,8 @@ export default Router()
 .post('/profile', async (req: AccountRequest, res) => {
     const account_id = req.auth!.account_id;
 
-    let account;
     try {
-        account = await Account.findByIdAndUpdate(
+        var account = await Account.findByIdAndUpdate(
             account_id, convertSubdoc(req.body, 'profile'),
             { new: true }
         );

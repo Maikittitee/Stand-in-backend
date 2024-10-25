@@ -5,8 +5,8 @@ import bcrypt from "bcrypt";
 export const userSchema = new Schema({
     username: {
         type: String,
-        required: true,
         unique: true,
+        required: true,
     },
     password: {
         type: String,
@@ -15,8 +15,8 @@ export const userSchema = new Schema({
     },
     email: {
         type: String,
-        required: true,
         unique: true,
+        required: true,
     },
 }, {
     timestamps: true,

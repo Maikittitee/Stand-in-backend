@@ -60,7 +60,7 @@ export const variantSchema = new Schema({
     options: {
         type: Map,
         of: String,
-        default: {},
+        default: new Map(),
     }
 });
 
@@ -96,6 +96,14 @@ export const itemSchema = new Schema({
     },
 }, {
     _id: false,
+    methods: {
+        async getPrice() {
+            const product = await Product.findById(this.product);
+            const variant = await ProductVariant.findById(product!.variant);
+
+            return variant!.price * this.quantity;
+        },
+    }
 });
 
 

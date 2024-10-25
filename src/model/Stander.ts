@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema } from 'mongoose';
 import { Order } from './Order.js';
 import { Account, Role } from './Account.js';
 
@@ -10,11 +10,13 @@ export const standerSchema = new Schema({
             default: false,
         },
         charge: {
-            type: Map, // key should be PackageSize
-            of: Number
+            type: Map, // [PackageSize] => Charge
+            of: Number,
+            default: new Map(),
         },
         description: {
             type: String,
+            default: '',
         },
     },
     shopping: {
@@ -24,12 +26,13 @@ export const standerSchema = new Schema({
         },
         charge: {
             type: Number,
-            required: true,
+            default: 0,
         },
     },
 }, {
     methods: {
         async getHistory() {
+            // filter where status != rejected
             return await Order.find({ stander: this._id });
         },
         async getScore() {

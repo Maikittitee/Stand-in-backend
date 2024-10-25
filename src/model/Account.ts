@@ -22,6 +22,7 @@ const profileSchema = new Schema({
     address: {
         type: Map,
         of: addressSchema,
+        default: new Map(),
     },
     // creditcard?: {
     //     number: String;

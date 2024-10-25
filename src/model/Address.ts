@@ -5,11 +5,10 @@ export const addressSchema = new Schema({
     country: {
         type: String,
         default: 'Thailand',
-        required: true,
     },
     zipcode: {
         type: String,
-        required: true,
+        default: '',
     },
     province: {
         type: String,
@@ -25,7 +24,7 @@ export const addressSchema = new Schema({
     },
     detail: {
         type: String,
-        required: true,
+        default: '',
     },
 }, {
     _id: false
