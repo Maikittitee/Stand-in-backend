@@ -49,7 +49,7 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 
     const user = await User.findOne({ username });
     if (user === null) {
-        res.status(400).json({
+        res.status(404).json({
             message: "Login Failed (user not found)"
         });
         return;
@@ -57,7 +57,7 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-        res.status(400).json({
+        res.status(401).json({
             message: "Login Failed (wrong username or password)"
         });
         return;
@@ -65,7 +65,7 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 
     const account = await Account.findOne({ user: user._id });
     if (account === null) {
-        res.status(400).end();
+        res.status(404).end();
         return;
     }
 

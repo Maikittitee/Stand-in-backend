@@ -10,13 +10,6 @@ export default Router()
     .use(validate_account(Role.Customer))
 
 
-.get('/history', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.account;
-    const history = await customer.getHistory();
-
-    res.json(history);
-})
-
 .get('/cart', async (req: CustomerRequest, res) => {
     const customer = req.auth!.account;
     const pop = await customer.populate({
@@ -45,6 +38,58 @@ export default Router()
     res.json(customer.cart);
 })
 
+.delete('/cart', async (req: CustomerRequest, res) => {
+    const customer = req.auth!.account;
+
+    // ...
+    // customer.cart.push(req.body);
+    // customer.save();
+
+    res.json(customer.cart);
+})
+
+.get('/order', async (req: CustomerRequest, res) => {
+    const customer = req.auth!.account;
+    const history = await customer.getHistory();
+
+    res.json(history);
+})
+
+.post('/order', async (req: CustomerRequest, res) => {
+    const customer = req.auth!.account;
+    const { stander, task } = req.body;
+
+    try {
+        var order = await Order.create({
+            customer: customer._id,
+            stander: stander,
+            task: task,
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error });
+        return;
+    }
+
+    res.json(order);
+})
+
+.get('/order/:id', async (req: CustomerRequest, res) => {
+    const customer = req.auth!.account;
+    const order = await Order.findById(req.params.id);
+
+    if (order === null) {
+        res.status(404).end();
+        return;
+    }
+    if (!order.customer.equals(customer._id)) {
+        res.status(403).end();
+        return;
+    }
+
+    res.json(order);
+})
+
 .post('/order/:id/review', async (req: CustomerRequest, res) => {
     const customer = req.auth!.account;
     const order = await Order.findById(req.params.id);
@@ -57,6 +102,7 @@ export default Router()
         res.status(403).end();
         return;
     }
+
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Completed) {
         res.status(400).end();
         return;
@@ -80,6 +126,7 @@ export default Router()
         res.status(403).end();
         return;
     }
+
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Accepted) {
         res.status(400).end();
         return;
@@ -103,6 +150,7 @@ export default Router()
         res.status(403).end();
         return;
     }
+
     if (order.orderStatus.at(-1)!.status >= OrderStatus.Paid) {
         res.status(400).end();
         return;
@@ -127,6 +175,7 @@ export default Router()
         res.status(403).end();
         return;
     }
+
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Rejected) {
         res.status(400).end();
         return;
@@ -137,23 +186,4 @@ export default Router()
     order.save();
 
     res.json(order.orderStatus);
-})
-
-.post('/order', async (req: CustomerRequest, res) => {
-    const customer = req.auth!.account;
-    const { stander, task } = req.body;
-
-    try {
-        var order = await Order.create({
-            customer: customer._id,
-            stander: stander,
-            task: task,
-        });
-    }
-    catch (error) {
-        res.status(400).json({ error });
-        return;
-    }
-
-    res.json(order);
 })

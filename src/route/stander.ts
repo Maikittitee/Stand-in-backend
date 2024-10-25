@@ -10,23 +10,88 @@ export default Router()
     .use(validate_account(Role.Stander))
 
 
-.get('/history', async (req: StanderRequest, res) => {
-    const stander = req.auth!.account;
-    const history = await stander.getHistory();
-
-    res.json(history);
-})
-
 .get('/queueing', async (req: StanderRequest, res) => {
     const stander = req.auth!.account;
 
+    // ...
     res.json();
 })
 
 .get('/shopping', async (req: StanderRequest, res) => {
     const stander = req.auth!.account;
 
+    // ...
     res.json();
+})
+
+.get('/order', async (req: StanderRequest, res) => {
+    const stander = req.auth!.account;
+    const history = await stander.getHistory();
+
+    res.json(history);
+})
+
+.get('/order/:id', async (req: StanderRequest, res) => {
+    const stander = req.auth!.account;
+    const order = await Order.findById(req.params.id);
+
+    if (order === null) {
+        res.status(404).end();
+        return;
+    }
+    if (!order.stander.equals(stander._id)) {
+        res.status(403).end();
+        return;
+    }
+
+    res.json(order);
+})
+
+.post('/order/:id', async (req: StanderRequest, res) => {
+    const stander = req.auth!.account;
+    const order = await Order.findById(req.params.id);
+
+    if (order === null) {
+        res.status(404).end();
+        return;
+    }
+    if (!order.stander.equals(stander._id)) {
+        res.status(403).end();
+        return;
+    }
+
+    let status: number | undefined = req.body.status;
+
+    if (status !== undefined) {
+        if (status === -1) {
+            let currentStatus = order.trackStatus.at(-1)?.status;
+
+            if (currentStatus === undefined) {
+                currentStatus = TrackStatus.On_the_way;
+            }
+            else {
+                status = currentStatus + 1;
+            }
+        }
+        if (TrackStatus.On_the_way <= status || status <= TrackStatus.Delivered) {
+            if (status === TrackStatus.Delivered) {
+                if (order.orderStatus.at(-1)!.status !== OrderStatus.Completed) {
+                    order.orderStatus.push({ status: OrderStatus.Completed });
+                }
+            }
+            order.trackStatus.push({ status });
+        }
+    }
+
+    try {
+        order.save();
+    }
+    catch (error) {
+        res.status(400).json({ error });
+        return;
+    }
+
+    res.json(order);
 })
 
 .post('/order/:id/accept', async (req: StanderRequest, res) => {
@@ -38,9 +103,10 @@ export default Router()
         return;
     }
     if (!order.stander.equals(stander._id)) {
-        res.status(401).end();
+        res.status(403).end();
         return;
     }
+
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Pending) {
         res.status(400).end();
         return;
@@ -61,9 +127,10 @@ export default Router()
         return;
     }
     if (!order.stander.equals(stander._id)) {
-        res.status(401).end();
+        res.status(403).end();
         return;
     }
+
     if (order.orderStatus.at(-1)!.status !== OrderStatus.Pending) {
         res.status(400).end();
         return;
@@ -73,39 +140,4 @@ export default Router()
     order.save();
 
     res.json(order.orderStatus);
-})
-
-.post('/order/:id/tracking', async (req: StanderRequest, res) => {
-    const stander = req.auth!.account;
-    const order = await Order.findById(req.params.id);
-
-    if (order === null) {
-        res.status(404).end();
-        return;
-    }
-    if (!order.stander.equals(stander._id)) {
-        res.status(401).end();
-        return;
-    }
-
-    let status: TrackStatus = req.body.status;
-
-    if (status === undefined) {
-        let currentStatus = order.trackStatus.at(-1)?.status;
-
-        if (currentStatus === undefined) {
-            currentStatus = TrackStatus.On_the_way;
-        }
-
-        status = currentStatus + 1;
-    }
-
-    if (status === TrackStatus.Delivered) {
-        order.orderStatus.push({ status: OrderStatus.Completed });
-    }
-
-    order.trackStatus.push({ status });
-    order.save();
-
-    res.json(order.trackStatus);
 })

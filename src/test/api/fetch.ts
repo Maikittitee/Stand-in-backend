@@ -1,46 +1,11 @@
-import 'dotenv/config';
-import { Role } from '../model/Account.js';
-import { TrackStatus } from '../model/Order.js';
-import { TaskType } from '../model/Task.js';
+import '../../server.js'
+import { get, post } from './index.js';
+
+import { Role } from '../../model/Account.js';
+import { TrackStatus } from '../../model/Order.js';
+import { TaskType } from '../../model/Task.js';
 
 
-async function request(path: string, option?: {}) {
-    const res = await fetch(DOMAIN + path, option);
-    const { url, status, headers } = res;
-
-    console.log('\n\n\nResponse:', { url, status, headers });
-
-    let content = null;
-
-    if (headers.get('content-type')?.includes('application/json')) {
-        content = await res.json();
-        console.log('Response Body:', content);
-    }
-
-    if (status >= 400) process.exit(0);
-
-    return content;
-}
-
-async function get(path: string, query = {}, headers?: {}) {
-    if (Object.keys(query).length > 0) {
-        path += '?' + new URLSearchParams(query);
-    }
-
-    return await request(path, { headers });
-}
-
-async function post(path: string, body = {}, headers?: {}) {
-    return await request(path, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers,
-    });
-}
-
-
-const PORT = process.env.PORT || 3000;
-const DOMAIN = `http://localhost:${PORT}`;
 const StanderHeader = {
     'Content-Type': 'application/json; charset=utf-8',
 };
@@ -71,12 +36,14 @@ content = await post('/auth/sign-in', {
     username: 'ts1',
     password: 'test',
 }, StanderHeader);
+
 StanderHeader['Authorization'] = `Bearer ${content.token}`;
 
 content = await post('/auth/sign-in', {
     username: 'tc1',
     password: 'test',
 }, CustomerHeader);
+
 CustomerHeader['Authorization'] = `Bearer ${content.token}`;
 
 
@@ -137,7 +104,7 @@ content = await get('/browse/stander');
 
 content = await get(`/browse/stander/${content[0]._id}`);
 
-content = await get('/stander/history', {}, StanderHeader);
+content = await get('/stander/order', {}, StanderHeader);
 
 content = await post('/customer/order', {
     stander: stander_id,
@@ -152,27 +119,27 @@ content = await post('/customer/order', {
 
 let order = content;
 
-content = await get('/stander/history', {}, StanderHeader);
+content = await get('/stander/order', {}, StanderHeader);
 
 
 
-content = await get('/customer/history', {}, CustomerHeader);
+content = await get('/customer/order', {}, CustomerHeader);
 
 content = await post(`/stander/order/${order._id}/accept`, {}, StanderHeader);
 
-content = await get('/customer/history', {}, CustomerHeader);
+content = await get('/customer/order', {}, CustomerHeader);
 
 content = await post(`/customer/order/${order._id}/pay`, {}, CustomerHeader);
 
-content = await get('/customer/history', {}, CustomerHeader);
+content = await get('/customer/order', {}, CustomerHeader);
 
-content = await post(`/stander/order/${order._id}/tracking`, {}, StanderHeader);
+content = await post(`/stander/order/${order._id}`, {}, StanderHeader);
 
-content = await post(`/stander/order/${order._id}/tracking`, {}, StanderHeader);
+content = await post(`/stander/order/${order._id}`, {}, StanderHeader);
 
-content = await post(`/stander/order/${order._id}/tracking`, {}, StanderHeader);
+content = await post(`/stander/order/${order._id}`, {}, StanderHeader);
 
-content = await post(`/stander/order/${order._id}/tracking`, {
+content = await post(`/stander/order/${order._id}`, {
     status: TrackStatus.Delivered,
 }, StanderHeader);
 
@@ -183,4 +150,8 @@ content = await post(`/customer/order/${order._id}/review`, {
     comment: 'good'
 }, CustomerHeader);
 
-content = await get('/customer/history', {}, CustomerHeader);
+content = await get('/customer/order', {}, CustomerHeader);
+
+
+
+process.exit(0);

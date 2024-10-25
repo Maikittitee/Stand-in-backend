@@ -10,4 +10,5 @@ for (const [key, doc] of Object.entries(documents)) {
     await doc.save();
 }
 
+
 process.exit(0);
