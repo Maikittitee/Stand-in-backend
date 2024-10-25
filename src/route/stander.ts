@@ -17,6 +17,18 @@ export default Router()
     res.json(history);
 })
 
+.get('/queueing', async (req: StanderRequest, res) => {
+    const stander = req.auth!.account;
+
+    res.json();
+})
+
+.get('/shopping', async (req: StanderRequest, res) => {
+    const stander = req.auth!.account;
+
+    res.json();
+})
+
 .post('/order/:id/accept', async (req: StanderRequest, res) => {
     const stander = req.auth!.account;
     const order = await Order.findById(req.params.id);
@@ -25,7 +37,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.stander !== stander._id) {
+    if (!order.stander.equals(stander._id)) {
         res.status(401).end();
         return;
     }
@@ -48,7 +60,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.stander !== stander._id) {
+    if (!order.stander.equals(stander._id)) {
         res.status(401).end();
         return;
     }
@@ -71,7 +83,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.stander !== stander._id) {
+    if (!order.stander.equals(stander._id)) {
         res.status(401).end();
         return;
     }
@@ -79,7 +91,12 @@ export default Router()
     let status: TrackStatus = req.body.status;
 
     if (status === undefined) {
-        const currentStatus = order.trackStatus.at(-1)!.status;
+        let currentStatus = order.trackStatus.at(-1)?.status;
+
+        if (currentStatus === undefined) {
+            currentStatus = TrackStatus.On_the_way;
+        }
+
         status = currentStatus + 1;
     }
 

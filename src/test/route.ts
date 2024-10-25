@@ -1,20 +1,25 @@
 import 'dotenv/config';
 import { Role } from '../model/Account.js';
 import { TrackStatus } from '../model/Order.js';
+import { TaskType } from '../model/Task.js';
 
 
 async function request(path: string, option?: {}) {
     const res = await fetch(DOMAIN + path, option);
-
     const { url, status, headers } = res;
+
     console.log('\n\n\nResponse:', { url, status, headers });
+
+    let content = null;
 
     if (headers.get('content-type')?.includes('application/json')) {
         content = await res.json();
         console.log('Response Body:', content);
-
-        return content;
     }
+
+    if (status >= 400) process.exit(0);
+
+    return content;
 }
 
 async function get(path: string, query = {}, headers?: {}) {
@@ -61,6 +66,7 @@ content = await post('/auth/sign-up', {
 }, CustomerHeader);
 
 
+
 content = await post('/auth/sign-in', {
     username: 'ts1',
     password: 'test',
@@ -75,26 +81,29 @@ CustomerHeader['Authorization'] = `Bearer ${content.token}`;
 
 
 
-content = await get('/user', {}, CustomerHeader);
+content = await get('/account', {}, StanderHeader);
+let stander_id = content;
 
-content = await post('/user',
+content = await get('/account/user', {}, CustomerHeader);
+
+content = await post('/account/user',
     { email: 'newemail@mail.com'},
     CustomerHeader
 );
 
-content = await get('/user', {}, CustomerHeader);
+content = await get('/account/user', {}, CustomerHeader);
 
 
 
-content = await get('/user/profile', {}, CustomerHeader);
+content = await get('/account/profile', {}, CustomerHeader);
 
-content = await post('/user/profile', {
+content = await post('/account/profile', {
     name: 'test customer 1',
     phone: '01012345678',
     image: 'https://cdn.britannica.com/68/178268-050-5B4E7FB6/Tom-Cruise-2013.jpg'
 }, CustomerHeader);
 
-content = await get('/user/profile', {}, CustomerHeader);
+content = await get('/account/profile', {}, CustomerHeader);
 
 
 
@@ -128,12 +137,12 @@ content = await get('/browse/stander');
 
 content = await get(`/browse/stander/${content[0]._id}`);
 
-
 content = await get('/stander/history', {}, StanderHeader);
 
 content = await post('/customer/order', {
-    stander: content._id,
+    stander: stander_id,
     task: {
+        kind: TaskType.Shopping,
         store: products[0].store,
         items: [
             { product: products[0]._id, quantity: 5 },
@@ -146,6 +155,7 @@ let order = content;
 content = await get('/stander/history', {}, StanderHeader);
 
 
+
 content = await get('/customer/history', {}, CustomerHeader);
 
 content = await post(`/stander/order/${order._id}/accept`, {}, StanderHeader);
@@ -155,7 +165,6 @@ content = await get('/customer/history', {}, CustomerHeader);
 content = await post(`/customer/order/${order._id}/pay`, {}, CustomerHeader);
 
 content = await get('/customer/history', {}, CustomerHeader);
-
 
 content = await post(`/stander/order/${order._id}/tracking`, {}, StanderHeader);
 

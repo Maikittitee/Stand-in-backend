@@ -12,6 +12,12 @@ export default Router()
 
 
 .get('/', async (req: AccountRequest, res) => {
+    const account_id = req.auth!.account_id;
+
+    res.json(account_id);
+})
+
+.get('/user', async (req: AccountRequest, res) => {
     const account = req.auth!.account;
     const user = await User.findById(account.user);
 
@@ -21,7 +27,7 @@ export default Router()
     });
 })
 
-.post('/', async (req: AccountRequest, res) => {
+.post('/user', async (req: AccountRequest, res) => {
     const account = req.auth!.account;
 
     try {
@@ -36,12 +42,6 @@ export default Router()
         username: user!.username,
         email: user!.email,
     });
-})
-
-.get('/id', async (req: AccountRequest, res) => {
-    const account_id = req.auth!.account_id;
-
-    res.json(account_id);
 })
 
 .get('/profile', async (req: AccountRequest, res) => {

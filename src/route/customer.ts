@@ -53,7 +53,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.customer !== customer._id) {
+    if (!order.customer.equals(customer._id)) {
         res.status(403).end();
         return;
     }
@@ -68,7 +68,7 @@ export default Router()
     res.json(order.review);
 })
 
-.get('/order/:id/pay', async (req: CustomerRequest, res) => {
+.post('/order/:id/pay', async (req: CustomerRequest, res) => {
     const customer = req.auth!.account;
     const order = await Order.findById(req.params.id);
 
@@ -76,7 +76,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.customer !== customer._id) {
+    if (!order.customer.equals(customer._id)) {
         res.status(403).end();
         return;
     }
@@ -99,7 +99,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.customer !== customer._id) {
+    if (!order.customer.equals(customer._id)) {
         res.status(403).end();
         return;
     }
@@ -123,7 +123,7 @@ export default Router()
         res.status(404).end();
         return;
     }
-    if (order.customer !== customer._id) {
+    if (!order.customer.equals(customer._id)) {
         res.status(403).end();
         return;
     }

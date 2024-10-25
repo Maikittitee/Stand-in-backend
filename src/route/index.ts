@@ -6,7 +6,7 @@ import address from './crud/address.js';
 import customer from './customer.js';
 import stander from './stander.js';
 import browse from './browse.js';
-import user from './user.js';
+import account from './account.js';
 import auth from './auth.js';
 
 
@@ -15,7 +15,7 @@ export default Router()
     // .use(address)
     // .use(order)
     .use('/auth', auth)
-    .use('/user', user)
+    .use('/account', account)
     .use('/customer', customer)
     .use('/stander', stander)
     .use('/browse', browse)
