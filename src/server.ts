@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 
 // https://www.mongodb.com/docs/drivers/node/current/fundamentals/bson/undefined-values/
-// ignore undefined fields when Model.find()
+// ignore undefined fields when using Model.find(), etc.
 mongoose.connect(uri, { ignoreUndefined: true })
     .then(() => console.log("Mongo connected"))
     .catch((error) => console.error("Mongo connection error:", error));
