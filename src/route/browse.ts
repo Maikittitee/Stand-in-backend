@@ -130,15 +130,20 @@ export default Router()
     const { name } = req.query;
     const all_store = await Store.find();
 
-    const stores = fuzz.extract(name, all_store, {
-        scorer: fuzz.partial_ratio,
-        processor: store => store.name,
-        cutoff: 50,
-    }).map(r => r[0]);
+    // const stores = fuzz.extract(name, all_store, {
+    //     scorer: fuzz.partial_ratio,
+    //     processor: store => store.name,
+    //     cutoff: 50,
+    // }).map(r => r[0]);
 
-    res.json(stores);
+    res.json(all_store);
 })
+.get('/store/:id', async (req, res) => {
+    const all_store = await Store.findById(req.params.id)
 
+
+    res.json(all_store);
+})
 .get('/building', async (req, res) => {
     const { name } = req.query;
     const all_building = await Building.find({
