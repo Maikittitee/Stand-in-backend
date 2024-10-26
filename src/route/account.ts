@@ -3,7 +3,7 @@ import { validate_jwt, validate_account } from '../middleware/auth.js';
 
 import { User } from '../model/User.js';
 import { Account } from '../model/Account.js';
-import { convertSubdoc } from '../service/index.js';
+import { ToNestedPath } from '../service/index.js';
 
 
 export default Router()
@@ -55,7 +55,7 @@ export default Router()
 
     try {
         var account = await Account.findByIdAndUpdate(
-            account_id, convertSubdoc(req.body, 'profile'),
+            account_id, ToNestedPath(req.body, 'profile'),
             { new: true }
         );
     }

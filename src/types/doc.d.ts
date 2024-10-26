@@ -11,15 +11,15 @@ import { taskSchema, queueingSchema, shoppingSchema } from '../model/Task.js';
 
 // type MethodsFrom<T>     = T extends Schema<any, any, infer Medthods, any, infer Virtuals, any, any, infer DocType> ? Medthods : never;
 // type DoctypeFrom<T>     = T extends Schema<any, any, infer Medthods, any, infer Virtuals, any, any, infer DocType> ? DocType : never;
-type CombinedSchema<SchemaA extends Schema, SchemaB extends Schema> = Schema<
-    ObtainSchemaGeneric<SchemaA, 'EnforcedDocType'> & ObtainSchemaGeneric<SchemaB, 'EnforcedDocType'>,
-    ObtainSchemaGeneric<SchemaA, 'M'> & ObtainSchemaGeneric<SchemaB, 'M'>,
-    ObtainSchemaGeneric<SchemaA, 'TInstanceMethods'> & ObtainSchemaGeneric<SchemaB, 'TInstanceMethods'>,
-    ObtainSchemaGeneric<SchemaA, 'TQueryHelpers'> & ObtainSchemaGeneric<SchemaB, 'TQueryHelpers'>,
-    ObtainSchemaGeneric<SchemaA, 'TVirtuals'> & ObtainSchemaGeneric<SchemaB, 'TVirtuals'>,
-    ObtainSchemaGeneric<SchemaA, 'TStaticMethods'> & ObtainSchemaGeneric<SchemaB, 'TStaticMethods'>,
-    ObtainSchemaGeneric<SchemaA, 'TSchemaOptions'> & ObtainSchemaGeneric<SchemaB, 'TSchemaOptions'>,
-    ObtainSchemaGeneric<SchemaA, 'DocType'> & ObtainSchemaGeneric<SchemaB, 'DocType'>
+type Discriminator<ParentSchema extends Schema, ExtendedSchema extends Schema> = Schema<
+    ObtainSchemaGeneric<ParentSchema, 'EnforcedDocType'> & ObtainSchemaGeneric<ExtendedSchema, 'EnforcedDocType'>,
+    ObtainSchemaGeneric<ParentSchema, 'M'> & ObtainSchemaGeneric<ExtendedSchema, 'M'>,
+    ObtainSchemaGeneric<ParentSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<ExtendedSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<ParentSchema, 'TQueryHelpers'> & ObtainSchemaGeneric<ExtendedSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<ParentSchema, 'TVirtuals'> & ObtainSchemaGeneric<ExtendedSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<ParentSchema, 'TStaticMethods'> & ObtainSchemaGeneric<ExtendedSchema, 'TStaticMethods'>,
+    ObtainSchemaGeneric<ParentSchema, 'TSchemaOptions'> & ObtainSchemaGeneric<ExtendedSchema, 'TSchemaOptions'>,
+    ObtainSchemaGeneric<ParentSchema, 'DocType'> & ObtainSchemaGeneric<ExtendedSchema, 'DocType'>
 >;
 
 
@@ -38,10 +38,10 @@ declare global {
         TSchema
     > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-    type TCustomerSchema    = CombinedSchema<typeof accountSchema, typeof customerSchema>;
-    type TStanderSchema     = CombinedSchema<typeof accountSchema, typeof standerSchema>;
-    type TQueueingSchema    = CombinedSchema<typeof taskSchema, typeof queueingSchema>
-    type TShoppingSchema    = CombinedSchema<typeof taskSchema, typeof shoppingSchema>
+    type TCustomerSchema    = Discriminator<typeof accountSchema, typeof customerSchema>;
+    type TStanderSchema     = Discriminator<typeof accountSchema, typeof standerSchema>;
+    type TQueueingSchema    = Discriminator<typeof taskSchema, typeof queueingSchema>
+    type TShoppingSchema    = Discriminator<typeof taskSchema, typeof shoppingSchema>
 
     type TUser              = HydratedDocumentFromSchema<typeof userSchema>;
     type TProductModel      = HydratedDocumentFromSchema<typeof modelSchema>;

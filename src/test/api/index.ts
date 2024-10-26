@@ -9,13 +9,12 @@ async function request(path: string, option?: {}) {
     const res = await fetch(DOMAIN + path, option);
     const { url, status, headers } = res;
 
-    console.log('\n\n\nResponse:', { url, status, headers });
-
+    console.log('\n\n\n\nRESPONSE:', [status, url]);
     let content = null;
 
     if (headers.get('content-type')?.includes('application/json')) {
         content = await res.json();
-        console.log('Response Body:', content);
+        console.log('RESPONSE BODY:', content);
     }
 
     if (status >= 400) process.exit(0);

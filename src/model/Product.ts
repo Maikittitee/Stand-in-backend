@@ -95,7 +95,6 @@ export const itemSchema = new Schema({
         required: true,
     },
 }, {
-    _id: false,
     methods: {
         async getPrice() {
             const product = await Product.findById(this.product);

@@ -32,7 +32,6 @@ export const standerSchema = new Schema({
 }, {
     methods: {
         async getHistory() {
-            // filter where status != rejected
             return await Order.find({ stander: this._id });
         },
         async getScore() {
