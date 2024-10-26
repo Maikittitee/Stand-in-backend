@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
-import customer from './customer.js';
-import stander from './stander.js';
+import customer from './customer/index.js';
+import stander from './stander/index.js';
 import browse from './browse.js';
 import account from './account.js';
 import auth from './auth.js';
