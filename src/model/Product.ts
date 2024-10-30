@@ -1,4 +1,4 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 
 export const Category = [
@@ -11,7 +11,7 @@ export const Category = [
 ];
 
 
-const brandSchema = new Schema({
+export const brandSchema = new Schema({
     name: {
         type: String,
         unique: true,
@@ -23,21 +23,7 @@ const brandSchema = new Schema({
 });
 
 
-const variantSchema = new Schema({
-    images: [String],
-    price: {
-        type: Number,
-    },
-    description: {
-        type: String,
-    },
-    option: {
-        type: String,
-    }
-});
-
-
-const modelSchema = new Schema({
+export const modelSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -51,51 +37,56 @@ const modelSchema = new Schema({
         type: String,
         enum: Category,
     },
-    variant: [variantSchema],
+    description: {
+        type: String,
+    },
 });
 
 
-const productSchema = new Schema({
+export const variantSchema = new Schema({
+    images: [String],
+    product_model: {
+        type: Schema.Types.ObjectId,
+        ref: 'ProductModel',
+        required: true,
+    },
+    price: {
+        type: Number,
+        required: true,
+    },
+    description: {
+        type: String,
+    },
+    options: {
+        type: Map,
+        of: String,
+        default: new Map(),
+    }
+});
+
+
+export const productSchema = new Schema({
     store: {
         type: Schema.Types.ObjectId,
         ref: 'Store',
         required: true,
     },
-    model: {
+    variant: {
         type: Schema.Types.ObjectId,
-        ref: 'ProductModel',
+        ref: 'ProductVariant',
         required: true,
     },
-    subproduct: [{
-        _id: false,
-        variant: {
-            type: Schema.Types.ObjectId,
-            // ref: 'ProductModel.variant',
-            required: true,
-        },
-        available: {
-            type: Boolean,
-            default: true,
-            required: true,
-        },
-    }],
+    available: {
+        type: Boolean,
+        required: true,
+    },
 });
 
 
-export interface IItem extends Types.Subdocument {
-    product: Types.ObjectId;
-    variant: Types.ObjectId;
-    quantity: number;
-}
-export const itemSchema = new Schema<IItem>({
+export const itemSchema = new Schema({
     product: {
         type: Schema.Types.ObjectId,
         ref: 'Product',
-        required: true,
-    },
-    variant: {
-        type: Schema.Types.ObjectId,
-        // ref: 'ProductModel.variant',
         required: true,
     },
     quantity: {
@@ -104,7 +95,14 @@ export const itemSchema = new Schema<IItem>({
         required: true,
     },
 }, {
-    _id: false,
+    methods: {
+        async getPrice() {
+            const product = await Product.findById(this.product);
+            const variant = await ProductVariant.findById(product!.variant);
+
+            return variant!.price * this.quantity;
+        },
+    }
 });
 
 
@@ -113,5 +111,6 @@ export const itemSchema = new Schema<IItem>({
 // https://stackoverflow.com/questions/24923469/modeling-product-variants
 
 export const Brand = model('Brand', brandSchema);
+export const ProductVariant = model('ProductVariant', variantSchema);
 export const ProductModel = model('ProductModel', modelSchema);
 export const Product = model('Product', productSchema);

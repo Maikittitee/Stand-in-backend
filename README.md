@@ -12,33 +12,41 @@ A simple API built using Express.js.
 
 2.	Navigate to the project directory:
 
-	```bash
-	cd standin-api
-	```
+    ```bash
+    cd standin-api
+    ```
 
 3.	Install the project dependencies:
 
-	```bash
-	npm install
-	```
+    ```bash
+    npm install
+    ```
 
 ## Running the Project
 
 - To start the API server, run:
 
-	```bash
-	npm start
-	```
+    ```bash
+    npm start
+    ```
 
 - For development with automatic reloading (using nodemon), run:
 
-	```bash
-	npm run dev
-	```
+    ```bash
+    npm run dev
+    ```
 
 ## Testing the Project
 
 - Test project using module in `src/test/`
-	```bash
-	npm test <filename.js>
-	```
+    ```bash
+    npm test <filename.js>
+    ```
+
+
+## Mocking database
+    ```bash
+    npm test db/mockup.js
+    npm test api/fetch.js
+    npm test api/clean.js
+    ```

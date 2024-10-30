@@ -1,99 +1,86 @@
-import express, { Request, Response, NextFunction } from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
+import 'dotenv/config';
+import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import User from "../model/User.js"; // Ensure User is correctly typed in User.ts
-import { IUser } from "../types/user.js";
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-dotenv.config();
+import { User } from "../model/User.js";
+import { Account, Role } from "../model/Account.js";
+import { roleMap } from '../middleware/auth.js';
+
 
 interface SignUpRequestBody {
-	fullname: string;
-	username: string;
-	password: string;
-	email: string;
-  }
+    username: string;
+    password: string;
+    email: string;
+}
+
 
 const router = express.Router();
 
 router.post('/sign-up', async (req: Request, res: Response) => {
-	try {
-		const { fullname, username, password, email } = req.body;
+    const { role, ...user_body } = req.body as { role: Role } & SignUpRequestBody;
+    const AccountModel = roleMap.get(role);
 
-		const password_hashed = await bcrypt.hash(password, 10);
+    if (AccountModel === undefined) {
+        res.status(400).end();
+        return;
+    }
 
-		const user_data = {
-			fullname,
-			username,
-			password: password_hashed,
-			email,
-		};
+    try {
+        var user = await User.create(user_body);
+    }
+    catch (error) {
+        res.status(400).json({ error });
+        return;
+    }
 
-		const user = await User.create(user_data);
-		res.json(user);
+    const account = await AccountModel.create({ user: user._id });
+    const token = jwt.sign(
+        { account_id: account._id },
+        process.env.SECRET,
+        { expiresIn: "1h" }
+    );
 
-	} catch (error) {
-		res.json({ error });
-	}
+    res.json({ token });
 });
 
 router.post('/sign-in', async (req: Request, res: Response) => {
-	try {
-		const { username, password } = req.body as { username: string; password: string };
+    const { username, password } = req.body as { username: string; password: string };
 
-		const user_data: any = await User.findOne({ username });
-		if (user_data == null) {
-			res.status(400).json({
-				message: "Login Failed (user not found)"
-			});
-			return;
-		}
+    const user = await User.findOne({ username });
+    if (user === null) {
+        res.status(404).json({
+            message: "Login Failed (user not found)"
+        });
+        return;
+    }
 
-		console.log(user_data);
-		const match = await bcrypt.compare(password, user_data.password);
-		if (!match) {
-			res.status(400).json({
-				message: "Login Failed (wrong username or password)"
-			});
-			return;
-		}
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+        res.status(401).json({
+            message: "Login Failed (wrong username or password)"
+        });
+        return;
+    }
 
-		const token = jwt.sign({
-			username: user_data.username,
-			role: "user"
-		}, "secret" , {expiresIn: "1h"} );
-		res.json({
-			message: "Login success",
-			token
-		});
+    const account = await Account.findOne({ user: user._id });
+    if (account === null) {
+        res.status(404).end();
+        return;
+    }
 
-	} catch (error) {
-		console.error("error: ", error);
-		res.status(401).json({
-			message: "Login Failed"
-		});
-	}
+    const token = jwt.sign(
+        { account_id: account._id },
+        process.env.SECRET,
+        { expiresIn: "1h" }
+    );
+
+    res.json({
+        message: "Login success",
+        role: account.role,
+        token
+    });
 });
 
-router.get('/me', async (req: Request, res: Response) => {
-	try {
-		const authHeader: any = req.headers["authorization"];
-		console.log(authHeader)
-		let authToken = ''
-		if (authHeader){
-			authToken = authHeader.split(' ')[1];
-		}
-		const user_data: any = jwt.verify(authToken, 'secret');
-		console.log(user_data);
-		const LoginUser = await User.findOne({username: user_data['username']});
-		res.json({
-			"message": "successful",
-			"data": LoginUser
-		});
-	} catch (error) {
-		res.json({ "message": error });
-	}
-});
 
 export default router;

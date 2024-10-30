@@ -2,7 +2,7 @@ declare global {
     namespace NodeJS {
         interface ProcessEnv {
             ATLAS_URI: string;
-            JWT_SECRET: string;
+            SECRET: string;
             PORT?: string;
         }
     }

@@ -1,46 +1,37 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 
-export interface IAddress extends Types.Subdocument {
-    country: string;
-    zipcode: string;
-    province: string;
-    district: string;
-    subdistrict: string;
-    detail: string;
-}
-export const addressSchema = new Schema<IAddress>({
-    country: { 
-        type: String, 
+export const addressSchema = new Schema({
+    country: {
+        type: String,
         default: 'Thailand',
-        required: true,
     },
     zipcode: {
         type: String,
+        default: '',
+    },
+    province: {
+        type: String,
         required: true,
     },
-    province: { 
-        type: String, 
+    district: {
+        type: String,
         required: true,
     },
-    district: { 
-        type: String, 
-        required: true,
-    },
-    subdistrict: { 
-        type: String, 
+    subdistrict: {
+        type: String,
         required: true,
     },
     detail: {
         type: String,
-        required: true,
+        default: '',
     },
-}, { 
-    _id: false 
+}, {
+    _id: false
 });
 
 
-const buildingSchema = new Schema({
+export const buildingSchema = new Schema({
     name: {
         type: String,
     },
@@ -51,9 +42,9 @@ const buildingSchema = new Schema({
 });
 
 
-const storeSchema = new Schema({
-    name: { 
-        type: String, 
+export const storeSchema = new Schema({
+    name: {
+        type: String,
         required: true,
     },
     building: {
