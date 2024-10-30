@@ -9,6 +9,9 @@ async function view_stander(stander: TStander) {
     return {
         _id: stander._id,
         profile: stander.profile,
+        queueing: stander.queueing,
+        shopping: stander.shopping,
+        groupshopping: stander.groupshopping,
         score: await stander.getScore(),
     }
 }

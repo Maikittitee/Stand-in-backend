@@ -28,6 +28,7 @@ const profileSchema = new Schema({
     //     number: String;
     // }
 }, {
+    _id: false,
     timestamps: { createdAt: false, updatedAt: true},
 });
 
