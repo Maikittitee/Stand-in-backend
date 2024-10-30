@@ -1,5 +1,7 @@
 import { Router } from 'express';
+
 import { Order, OrderStatus } from '../../model/Order.js';
+import { TaskType } from '../../model/Task.js';
 
 
 export default Router()
@@ -141,4 +143,33 @@ export default Router()
         order.save();
 
         res.json(order.orderStatus);
+    })
+
+    .post('/from-cart', async (req: CustomerRequest, res) => {
+        const customer = req.auth!.account;
+        const kind: TaskType.Shopping | TaskType.GroupShopping = req.body.kind;
+
+        if (customer.cart.length === 0) {
+            res.status(404).end();
+            return;
+        }
+
+        try {
+            var order = await Order.create({
+                customer: customer._id,
+                stander: req.body.stander,
+                task: {
+                    kind: kind,
+                    items: customer.cart,
+                }
+            });
+        }
+        catch (error) {
+            res.status(400).json({ error });
+            return;
+        }
+
+        customer.cart.splice(0, customer.cart.length);
+
+        res.json(order);
     })

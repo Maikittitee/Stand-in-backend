@@ -6,6 +6,7 @@ import { addressSchema } from './Address.js';
 export enum TaskType {
     Queueing,
     Shopping,
+    GroupShopping,
 }
 export enum PackageSize {
     Small = 's',
@@ -50,11 +51,13 @@ export const queueingSchema = new Schema({
 
 
 export const shoppingSchema = new Schema({
-    store: {
-        type: Schema.Types.ObjectId,
-        ref: 'Store',
-        required: true,
-    },
+    items: [itemSchema],
+}, {
+    _id: false,
+});
+
+
+export const groupshoppingSchema = new Schema({
     items: [itemSchema],
 }, {
     _id: false,
@@ -67,6 +70,8 @@ export function isQueueing(task: any): task is TQueueing {
 export function isShopping(task: any): task is TShopping {
     return task.kind === TaskType.Shopping;
 }
-
+export function isGroupShopping(task: any): task is TGroupShopping {
+    return task.kind === TaskType.GroupShopping;
+}
 
 // https://mongoosejs.com/docs/discriminators.html

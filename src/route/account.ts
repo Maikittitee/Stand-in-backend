@@ -34,7 +34,7 @@ export default Router()
         var user = await User.findByIdAndUpdate(account.user, req.body)
     }
     catch (error) {
-        res.status(400).end();
+        res.status(400).json({ error });
         return;
     }
 
@@ -60,7 +60,7 @@ export default Router()
         );
     }
     catch (error) {
-        res.status(400).end();
+        res.status(400).json({ error });
         return;
     }
 

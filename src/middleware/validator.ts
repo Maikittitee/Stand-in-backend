@@ -8,5 +8,6 @@ export function convertQuery(req: Request, res: Response, next: NextFunction) {
             delete req.query[key];
         }
     }
+
     next();
 }

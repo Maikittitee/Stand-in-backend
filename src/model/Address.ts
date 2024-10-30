@@ -4,27 +4,22 @@ import { Schema, model } from 'mongoose';
 export const addressSchema = new Schema({
     country: {
         type: String,
-        default: 'Thailand',
+        // default: 'Thailand',
     },
     zipcode: {
         type: String,
-        default: '',
     },
     province: {
         type: String,
-        required: true,
     },
     district: {
         type: String,
-        required: true,
     },
     subdistrict: {
         type: String,
-        required: true,
     },
     detail: {
         type: String,
-        default: '',
     },
 }, {
     _id: false

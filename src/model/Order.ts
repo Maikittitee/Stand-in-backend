@@ -1,5 +1,5 @@
 import { Schema, model, InferSchemaType, Types } from 'mongoose';
-import { TaskType, taskSchema, queueingSchema, shoppingSchema } from './Task.js';
+import { TaskType, taskSchema, queueingSchema, shoppingSchema, groupshoppingSchema } from './Task.js';
 import { Stander } from './Stander.js';
 
 
@@ -97,8 +97,6 @@ export const orderSchema = new Schema({
 
                 return charge;
             }
-            // return 3;
-
             else if (tasktype === TaskType.Shopping) {
                 // @ts-ignore
                 const task: InferSchemaType<TShoppingSchema> = this.task;
@@ -120,6 +118,7 @@ export const orderSchema = new Schema({
 const taskPath = orderSchema.path<Schema.Types.Subdocument>('task');
 taskPath.discriminator(TaskType.Queueing, queueingSchema);
 taskPath.discriminator(TaskType.Shopping, shoppingSchema);
+taskPath.discriminator(TaskType.GroupShopping, groupshoppingSchema);
 
 
 // https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design

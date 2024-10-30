@@ -29,6 +29,24 @@ export const standerSchema = new Schema({
             default: 0,
         },
     },
+    groupshopping: {
+        available: {
+            type: Boolean,
+            default: false,
+        },
+        store: {
+            type: Schema.Types.ObjectId,
+            ref: 'Store',
+        },
+        building: {
+            type: Schema.Types.ObjectId,
+            ref: 'Building',
+        },
+        charge: {
+            type: Number,
+            default: 0,
+        },
+    }
 }, {
     methods: {
         async getHistory() {
