@@ -5,11 +5,11 @@ const PORT = process.env.PORT || 3000;
 const DOMAIN = `http://localhost:${PORT}`;
 
 
-async function request(path: string, option?: {}) {
+async function request(method: string, path: string, option?: {}) {
     const res = await fetch(DOMAIN + path, option);
     const { url, status, headers } = res;
 
-    console.log('\n\n\n\nRESPONSE:', [status, url]);
+    console.log(`\n\n\n\n${method}:`, [url, status]);
     let content = null;
 
     if (headers.get('content-type')?.includes('application/json')) {
@@ -27,11 +27,11 @@ export async function get(path: string, query = {}, headers?: {}) {
         path += '?' + new URLSearchParams(query);
     }
 
-    return await request(path, { headers });
+    return await request('GET', path, { headers });
 }
 
 export async function post(path: string, body = {}, headers?: {}) {
-    return await request(path, {
+    return await request('POST', path, {
         method: 'POST',
         body: JSON.stringify(body),
         headers,

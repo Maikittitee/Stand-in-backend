@@ -5,8 +5,9 @@ import { standerSchema } from '../model/Stander.js';
 import { customerSchema } from '../model/Customer.js';
 import { modelSchema } from '../model/Product.ts';
 import { orderSchema } from '../model/Order.js';
+import { productSchema } from '../model/Product.ts';
 import { userSchema } from '../model/User.js';
-import { taskSchema, queueingSchema, shoppingSchema } from '../model/Task.js';
+import { taskSchema, queueingSchema, shoppingSchema, groupshoppingSchema } from '../model/Task.js';
 
 
 // type MethodsFrom<T>     = T extends Schema<any, any, infer Medthods, any, infer Virtuals, any, any, infer DocType> ? Medthods : never;
@@ -42,8 +43,10 @@ declare global {
     type TStanderSchema     = Discriminator<typeof accountSchema, typeof standerSchema>;
     type TQueueingSchema    = Discriminator<typeof taskSchema, typeof queueingSchema>
     type TShoppingSchema    = Discriminator<typeof taskSchema, typeof shoppingSchema>
+    type TGShoppingSchema   = Discriminator<typeof taskSchema, typeof groupshoppingSchema>
 
     type TUser              = HydratedDocumentFromSchema<typeof userSchema>;
+    type TProduct           = HydratedDocumentFromSchema<typeof productSchema>;
     type TProductModel      = HydratedDocumentFromSchema<typeof modelSchema>;
     type TOrder             = HydratedDocumentFromSchema<typeof orderSchema>;
 
@@ -53,4 +56,5 @@ declare global {
 
     type TQueueing          = HydratedDocumentFromSchema<TQueueingSchema>;
     type TShopping          = HydratedDocumentFromSchema<TShoppingSchema>;
+    type TGroupShopping     = HydratedDocumentFromSchema<TGShoppingSchema>;
 }

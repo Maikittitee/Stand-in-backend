@@ -1,9 +1,9 @@
-import '../../server.js'
+// import '../../server.js'
 import { get, post } from './index.js';
 
 import { Role } from '../../model/Account.js';
 import { TrackStatus } from '../../model/Order.js';
-import { TaskType } from '../../model/Task.js';
+import { PackageSize, TaskType } from '../../model/Task.js';
 
 
 const StanderHeader = {
@@ -12,18 +12,18 @@ const StanderHeader = {
 const CustomerHeader = {
     'Content-Type': 'application/json; charset=utf-8',
 };
-let content: any;
+let content, order, stander_id, products;
 
 
 
-content = await post('/auth/sign-up', {
+await post('/auth/sign-up', {
     username: 'ts1',
     password: 'test',
     email: 'ts1@gmail.com',
     role: Role.Stander,
 }, StanderHeader);
 
-content = await post('/auth/sign-up', {
+await post('/auth/sign-up', {
     username: 'tc1',
     password: 'test',
     email: 'tc1@gmail.com',
@@ -48,109 +48,146 @@ CustomerHeader['Authorization'] = `Bearer ${content.token}`;
 
 
 
-content = await get('/account', {}, StanderHeader);
-let stander_id = content;
+stander_id = await get('/account', {}, StanderHeader);
 
-content = await get('/account/user', {}, CustomerHeader);
+await get('/account/user', {}, CustomerHeader);
 
-content = await post('/account/user',
-    { email: 'newemail@mail.com'},
-    CustomerHeader
-);
+await post('/account/user', {
+    email: 'newemail@mail.com'
+}, CustomerHeader);
 
-content = await get('/account/user', {}, CustomerHeader);
+await get('/account/user', {}, CustomerHeader);
 
 
 
-content = await get('/account/profile', {}, CustomerHeader);
+await get('/account/profile', {}, CustomerHeader);
 
-content = await post('/account/profile', {
+await post('/account/profile', {
     name: 'test customer 1',
     phone: '01012345678',
     image: 'https://cdn.britannica.com/68/178268-050-5B4E7FB6/Tom-Cruise-2013.jpg'
 }, CustomerHeader);
 
-content = await get('/account/profile', {}, CustomerHeader);
+await get('/account/profile', {}, CustomerHeader);
 
 
 
-content = await get('/browse/product');
+products = await get('/browse/product');
 
-let products = content;
+await get(`/browse/product/${products[0]._id}`);
 
-content = await get(`/browse/product/${products[0]._id}`);
-
-content = await get(`/browse/product/${products[1]._id}`);
+await get(`/browse/product/${products[1]._id}`);
 
 
 
-content = await get('/customer/cart', {}, CustomerHeader);
+await get('/customer/cart', {}, CustomerHeader);
 
-content = await post('/customer/cart', {
+await post('/customer/cart', {
     product: products[0]._id,
     quantity: 1,
 }, CustomerHeader);
 
-content = await post('/customer/cart', {
+await post('/customer/cart', {
     product: products[1]._id,
     quantity: 3,
 }, CustomerHeader);
 
-content = await get('/customer/cart', {}, CustomerHeader);
+await get('/customer/cart', {}, CustomerHeader);
 
 
 
 content = await get('/browse/stander');
 
-content = await get(`/browse/stander/${content[0]._id}`);
+await get(`/browse/stander/${content[0]._id}`);
 
-content = await get('/stander/order', {}, StanderHeader);
+await get('/stander/order', {}, StanderHeader);
 
-content = await post('/customer/order', {
+
+// ใช้ /customer/order/from-cart ดีกว่า
+order = await post('/customer/order', {
     stander: stander_id,
     task: {
         kind: TaskType.Shopping,
-        store: products[0].store,
         items: [
             { product: products[0]._id, quantity: 5 },
         ],
     },
 }, CustomerHeader);
 
-let order = content;
+// ดู orders ทั้งหมดของ stander
+await get('/stander/order', {}, StanderHeader);
 
-content = await get('/stander/order', {}, StanderHeader);
+// ดู orders ทั้งหมดของ customer
+await get('/customer/order', {}, CustomerHeader);
+
+// stander รับ order
+await post(`/stander/order/${order._id}/accept`, {}, StanderHeader);
+
+// แค่เช็คดู status ของ order
+await get('/customer/order', {}, CustomerHeader);
+
+// ส่งจ่ายเงิน
+await post(`/customer/order/${order._id}/pay`, {}, CustomerHeader);
+
+// เช็ค status ของ order ใหม่
+await get('/customer/order', {}, CustomerHeader);
 
 
+// อัพเดต status ต่อไป
+await post(`/stander/order/${order._id}`, {}, StanderHeader);
+await post(`/stander/order/${order._id}`, {}, StanderHeader);
+await post(`/stander/order/${order._id}`, {}, StanderHeader);
 
-content = await get('/customer/order', {}, CustomerHeader);
-
-content = await post(`/stander/order/${order._id}/accept`, {}, StanderHeader);
-
-content = await get('/customer/order', {}, CustomerHeader);
-
-content = await post(`/customer/order/${order._id}/pay`, {}, CustomerHeader);
-
-content = await get('/customer/order', {}, CustomerHeader);
-
-content = await post(`/stander/order/${order._id}`, {}, StanderHeader);
-
-content = await post(`/stander/order/${order._id}`, {}, StanderHeader);
-
-content = await post(`/stander/order/${order._id}`, {}, StanderHeader);
-
-content = await post(`/stander/order/${order._id}`, {
+// อัพเดต status แบบเลือก
+await post(`/stander/order/${order._id}`, {
     status: TrackStatus.Delivered,
 }, StanderHeader);
 
 
-
-content = await post(`/customer/order/${order._id}/review`, {
+// เขียน รีวิว
+await post(`/customer/order/${order._id}/review`, {
     rating: 5,
     comment: 'good'
 }, CustomerHeader);
 
-content = await get('/customer/order', {}, CustomerHeader);
+await get('/customer/order', {}, CustomerHeader);
+
+
+// สร้าง queueing order
+order = await post('/customer/order', {
+    stander: stander_id,
+    task: {
+        kind: TaskType.Queueing,
+        location: {
+            province: 'Bangkok',
+            district: 'Pathum Wan',
+            subdistrict: 'Wang Mai',
+            detail: 'อุโมงลับใต้ดิน หลังสวน 100',
+        },
+        datetime: Date.now() + 60000,
+        size: PackageSize.Medium,
+        detail: 'วัตถุระเบิด C4',
+    },
+}, CustomerHeader)
+
+
+// แบบ group shopping
+order = await post('/customer/order', {
+    stander: stander_id,
+    task: {
+        kind: TaskType.GroupShopping,
+        items: [
+            { product: products[1]._id, quantity: 3 },
+        ],
+    },
+}, CustomerHeader);
+
+
+// shopping order จากตระกร้า
+order = await post('/customer/order/from-cart', {
+    stander: stander_id,
+    kind: TaskType.Shopping,
+}, CustomerHeader);
 
 
 

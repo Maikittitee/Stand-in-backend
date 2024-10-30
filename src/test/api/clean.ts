@@ -1,8 +1,8 @@
 import '../db/connection.js'
 
-import { Account } from "../../model/Account.js";
-import { User } from "../../model/User.js";
-import { Order } from "../../model/Order.js";
+import { Account } from '../../model/Account.js';
+import { User } from '../../model/User.js';
+import { Order } from '../../model/Order.js';
 
 
 const standerUser = await User.findOneAndDelete({ username: 'ts1' });
@@ -17,7 +17,7 @@ console.log(stander);
 const customer = await Account.findOneAndDelete({ user: customerUser!._id });
 console.log(customer);
 
-const order = await Order.findOneAndDelete({ customer: customer!._id });
+const order = await Order.deleteMany({ customer: customer!._id });
 console.log(order);
 
 
